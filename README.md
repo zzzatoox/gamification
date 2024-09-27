@@ -1,3 +1,3 @@
 ```
-pip install django python-dotenv
+pip install django python-dotenv Pillow
 ```

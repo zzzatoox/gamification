@@ -2,43 +2,56 @@
     {% block head %}
     {% endblock %}
 </head>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="font-size: 16pt;">
     <div class="container-fluid">
-      <a class="navbar-brand ms-5" href="#">Gamification</a>
+      <a class="navbar-brand ms-5" style="font-size: 16pt;" href="/">Gamification</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <div class="collapse navbar-collapse" >
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item ms-2">
-            <a class="nav-link active" aria-current="page" href="#">Главная</a>
+          <li class="nav-item m-2">
+            <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Главная</a>
           </li>
-          <li class="nav-item dropdown ms-2">
-            <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <li class="nav-item dropdown m-2">
+            <a class="nav-link dropdown-toggle active" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Рейтинги
             </a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="#">Команды</a></li>
-              <li><a class="dropdown-item" href="#">Участники</a></li>
+              <li><a class="dropdown-item" href="{% url 'ratings_teams' %}">Команды</a></li>
+              <li><a class="dropdown-item" href="{% url 'ratings_users' %}">Участники</a></li>
             </ul>
           </li>
+          <li class="nav-item m-2">
+            <!--Если пользователь состоит в команде - то отобразить кнопку "Моя команда"-->
+            <!--Иначе, отобразить кнопку "Создать команду"-->
+            <a class="nav-link active" href="{% url 'create_team' %}">Создать команду</a>
+          </li>
+          <li class="nav-item m-2">
+            <!--Можно будет просматривать как свои, так и чужие команды-->
+            <a class="nav-link active" href="{% url 'team' %}">Моя команда</a>
+          </li>
         </ul>
-        <ul class="navbar-nav ms-auto mb-2 me-2 mb-lg-0">
+        <ul class="navbar-nav  m-2 mb-lg-0">
+          <!--Если пользователь аутентифицирофан - то отобразить кнопки "Мой профиль" и "Выход"-->
+          <!--Иначе, отобразить кнопки "Войти" и "Зарегистрироаться"-->
           <li class="nav-item">
-              <a class="nav-link active">Войти</a>
+              <a class="nav-link active" href="{% url 'authorization' %}">Войти</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active">Зарегистрироваться</a>
+            <a class="nav-link active" href="{% url 'profile' %}">Профиль</a>
+        </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url 'registration' %}">Зарегистрироваться</a>
           </li>
         </ul>
       </div>
     </div>
   </nav>
 
-  <body>
-      {% block body %}
-      {% endblock %}
-  </body>
+{% block body %}
+{% endblock %}
+
   
-  {% block js-scripts %}
-  {% endblock %}
+{% block js-scripts %}
+{% endblock %}

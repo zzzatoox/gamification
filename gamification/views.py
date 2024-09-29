@@ -2,8 +2,22 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import login as auth_login
-from django.shortcuts import redirect, render
-from .models import User, Team, TeamEmployee
+from django.shortcuts import redirect, render, get_object_or_404
+from django.contrib import messages
+from django.utils import timezone
+
+from .forms import CreateTaskForm
+
+from django.db import transaction
+from .models import (
+    User,
+    Team,
+    TeamEmployee,
+    Achievement,
+    AchievementEmployee,
+    Task,
+    TaskEmployee,
+)
 
 
 # Create your views here.
@@ -112,6 +126,14 @@ def logout(request):
 
 
 @login_required
+def get_teams(request):
+    user = request.user
+    teams = TeamEmployee.objects.filter(employee=user).values_list("team", flat=True)
+    teams = Team.objects.filter(id__in=teams)
+    return render(request, "teams.html", {"teams": teams})
+
+
+@login_required
 def create_team(request):
     if request.method == "POST":
         title = request.POST.get("title")
@@ -133,18 +155,122 @@ def ratings_users(request):
 
 
 @login_required
-def team(request):
+def team_detail(request, team_id):
     # Проверять, является ли пользователь участником команды и выдавать страницу в зависимости от прав
     user = request.user
-    is_team_owner = Team.objects.filter(owner=user).exists()
-    is_team_member = TeamEmployee.objects.filter(employee=user).exists()
+    is_team_owner = Team.objects.filter(owner=user, id=team_id).exists()
+    is_team_member = TeamEmployee.objects.filter(
+        employee=user, team_id=team_id
+    ).exists()
 
     if is_team_owner:
-        return render(request, "team.html")
+        team = Team.objects.get(id=team_id)
+        return render(
+            request, "team_detail.html", {"team": team, "is_team_owner": True}
+        )
     elif is_team_member:
-        return render(request, "team.html")
+        team = Team.objects.get(id=team_id)
+        return render(
+            request, "team_detail.html", {"team": team, "is_team_owner": False}
+        )
+    else:
+        return redirect("home")
 
 
 def profile(request):
     # Проверять, является ли пользователь владельцем своей страницы, и выдавать соотв. функционал
-    return render(request, "profile.html")
+    user = request.user
+    user_obj = User.objects.filter(id=user.id).exists()
+
+    if user_obj:
+        user_info = User.objects.get(id=user.id)
+        achievements = AchievementEmployee.objects.filter(
+            employee=user_info
+        ).values_list("achievement", flat=True)
+        achievements_obj = Achievement.objects.filter(id__in=achievements)
+        return render(
+            request,
+            "profile.html",
+            {"user_info": user_info, "achievements": achievements_obj},
+        )
+    else:
+        return redirect("home")
+
+
+@login_required
+def profile_with_id(request, user_id):
+    # Проверять, является ли пользователь владельцем своей страницы, и выдавать соотв. функционал
+    user = request.user
+    is_user_owner = user.id == user_id
+
+    if is_user_owner:
+        user_info = User.objects.get(id=user_id)
+        return render(
+            request, "profile.html", {"user_info": user_info, "is_user_owner": True}
+        )
+    else:
+        return render(
+            request, "profile.html", {"user_info": user_info, "is_user_owner": False}
+        )
+
+
+# @login_required
+# def create_task(request):
+#     if request.method == "POST":
+#         title = request.POST.get("title")
+#         description = request.POST.get("description")
+#         deadline = request.POST.get("deadline")
+#         assigned_to = request.POST.get("assigned_to")
+
+#         task = Task.objects.create(
+#             title=title,
+#             description=description,
+#             deadline=deadline,
+#         )
+#         if assigned_to:
+#             TaskEmployee.objects.create(
+#                 task=task, employee=User.objects.get(id=assigned_to)
+#             )
+
+#         return redirect("task_detail", task_id=task.id)
+#         # else:
+#         # return render(
+#         #     request,
+#         #     "create_task.html",
+#         #     {"error_message": "Поле назначение сотрудника не заполнено"},
+#         # )
+#     return render(request, "create_task.html")
+
+
+@login_required
+def create_task(request):
+    if request.method == "POST":
+        form = CreateTaskForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("task_list")
+    else:
+        form = CreateTaskForm()
+
+    return render(request, "create_task.html", {"form": form})
+
+
+@login_required
+def complete_task(request, task_id, employee_id):
+    task_employee = get_object_or_404(
+        TaskEmployee, task_id=task_id, employee_id=employee_id
+    )
+
+    if task_employee.completed_at:
+        messages.error(request, "Задача уже выполнена")
+        return redirect("task_detail", task_id=task_id)
+
+    task_employee.completed_at = timezone.now()
+    task_employee.save()
+
+    user = task_employee.employee
+    user.xp += task_employee.task.xp_reward
+    user.save()
+
+    messages.success(request, "Задача выполнена")
+    return redirect("task_detail", task_id=task_id)

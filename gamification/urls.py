@@ -10,10 +10,10 @@ urlpatterns = [
     path("registration/", views.registration, name="registration"),
     path("logout/", views.logout, name="logout"),
     path("create_team/", views.create_team, name="create_team"),
-    path("team/", views.team, name="team"),
-    path("team/<int:team_id>", views.team, name="team_with_id"),
+    path("teams/", views.get_teams, name="teams"),
+    path("team_detail/<int:team_id>", views.team_detail, name="team_detail"),
     path("profile/", views.profile, name="profile"),
-    path("profile/<int:user_id>", views.profile, name="profile_with_id"),
+    path("profile/<int:user_id>", views.profile_with_id, name="profile_with_id"),
     path("ratings_teams/", views.ratings_teams, name="ratings_teams"),
     path("ratings_users/", views.ratings_users, name="ratings_users"),
 ]

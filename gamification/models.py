@@ -43,7 +43,9 @@ class Team(models.Model):
     photo = models.ImageField(upload_to="teams/", null=True, blank=True)
     title = models.CharField(max_length=30, null=False)
     created_at = models.DateTimeField(default=timezone.now, null=False)
-
+    # Поле xp рассчитывается в зависимости от общего среднего xp всех участников,
+    # и изменяется оно только тогда, когда кто-то из команды получает опыт
+    xp = models.IntegerField(default=0, null=False)
     def __str__(self):
         return self.title
 

@@ -4,6 +4,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import login as auth_login
 from django.shortcuts import redirect, render
 from .models import User, Team, TeamEmployee
+from django.contrib.auth.forms import PasswordResetForm
 
 
 # Create your views here.
@@ -52,13 +53,6 @@ def registration(request):
         repeat_password = request.POST.get("repeat_password")
         full_name = request.POST.get("full_name")
 
-        if not all([username, password, email, repeat_password, full_name]):
-            return render(
-                request,
-                "account/registration.html",
-                {"error_message": "Все поля должны быть заполнены"},
-            )
-
         # Проверка на наличие символа @ в логине
         if "@" in username:
             return render(
@@ -66,8 +60,13 @@ def registration(request):
                 "account/registration.html",
                 {"error_message": "Логин не может содержать символ '@'"},
             )
-
+        
         full_name = full_name.strip().split()
+
+        if len(full_name)<2:
+            return render(request,
+                          'account/registration.html',
+                          {'error_message':"Введите ФИО корректно, каждое слово через пробел"})
         full_name = [name.capitalize() for name in full_name]
         last_name = full_name[0]
         first_name = full_name[1]
@@ -110,8 +109,11 @@ def logout(request):
     auth_logout(request)
     return redirect("home")
 
+def forgot_password(request):
+    return render(request, 'account/forgot_password.html', {'form':PasswordResetForm})
 
-@login_required
+
+@login_required(login_url='authorization')
 def create_team(request):
     if request.method == "POST":
         title = request.POST.get("title")
@@ -132,19 +134,28 @@ def ratings_users(request):
     return render(request, "ratings_users.html")
 
 
-@login_required
-def team(request):
+def teams(request):
+    team_list = Team.objects.get().order_by('xp')
+    return render(request, 'teams.html', context=team_list)
+
+@login_required(login_url='authorization')
+def team_detail(request):
     # Проверять, является ли пользователь участником команды и выдавать страницу в зависимости от прав
     user = request.user
     is_team_owner = Team.objects.filter(owner=user).exists()
     is_team_member = TeamEmployee.objects.filter(employee=user).exists()
 
     if is_team_owner:
-        return render(request, "team.html")
+        pass #context add
     elif is_team_member:
-        return render(request, "team.html")
+        pass#context add
+    return render(request, "team_details.html")
 
+@login_required(login_url='authorization')
+def team_detail_test(request):
+    return render(request, 'team_detail_test.html')
 
 def profile(request):
     # Проверять, является ли пользователь владельцем своей страницы, и выдавать соотв. функционал
+
     return render(request, "profile.html")

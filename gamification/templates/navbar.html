@@ -2,7 +2,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light" style="font-size: 16pt;">
     <div class="container-fluid">
-        <a class="navbar-brand ms-5" style="font-size: 16pt;" href="/">Gamification</a>
+        <a class="navbar-brand ms-5" style="font-size: 16pt;" href="/">Motiv8</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -25,7 +25,7 @@
                 {% if user.is_authenticated %}
                 <li class="nav-item m-2">
                     {% if is_in_team %}
-                    <a class="nav-link active" href="{% url 'team' %}">Моя команда</a>
+                    <a class="nav-link active" href="{% url 'team_detail_test' %}">Моя команда</a> 
                     {% else %}
                     <a class="nav-link active" href="{% url 'create_team' %}">Создать команду</a>
                     {% endif %}
@@ -34,18 +34,18 @@
             </ul>
             <ul class="navbar-nav  m-2 mb-lg-0">
                 {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'profile' %}">Профиль</a>
+                <li class="nav-item m-2">
+                    <a class="nav-link active" href="{% url 'profile' %}">{user.login}</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item m-2">
                     <a class="nav-link active" href="{% url 'logout' %}">Выход</a>
                 </li>
                 {% else %}
-                <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'authorization' %}">Войти</a>
+                <li class="nav-item m-2">
+                    <a class="nav-link active" href="{% url 'authorization' %}">Вход</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'registration' %}">Зарегистрироваться</a>
+                <li class="nav-item m-2">
+                    <a class="nav-link active" href="{% url 'registration' %}">Регистрация</a>
                 </li>
                 {% endif %}
             </ul>

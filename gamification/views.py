@@ -5,6 +5,7 @@ from django.contrib.auth import login as auth_login
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
+from django.contrib.auth.forms import PasswordResetForm
 
 from .forms import CreateTaskForm
 
@@ -66,13 +67,6 @@ def registration(request):
         repeat_password = request.POST.get("repeat_password")
         full_name = request.POST.get("full_name")
 
-        if not all([username, password, email, repeat_password, full_name]):
-            return render(
-                request,
-                "account/registration.html",
-                {"error_message": "Все поля должны быть заполнены"},
-            )
-
         # Проверка на наличие символа @ в логине
         if "@" in username:
             return render(
@@ -82,6 +76,13 @@ def registration(request):
             )
 
         full_name = full_name.strip().split()
+
+        if len(full_name) < 2:
+            return render(
+                request,
+                "account/registration.html",
+                {"error_message": "Введите ФИО корректно, каждое слово через пробел"},
+            )
         full_name = [name.capitalize() for name in full_name]
         last_name = full_name[0]
         first_name = full_name[1]
@@ -125,6 +126,10 @@ def logout(request):
     return redirect("home")
 
 
+def forgot_password(request):
+    return render(request, "account/forgot_password.html", {"form": PasswordResetForm})
+
+
 @login_required
 def get_teams(request):
     user = request.user
@@ -147,7 +152,8 @@ def create_team(request):
 
 
 def ratings_teams(request):
-    return render(request, "ratings_teams.html")
+    team_list = Team.objects.get().order_by("xp")
+    return render(request, "ratings_teams.html", {"teams": team_list})
 
 
 def ratings_users(request):
@@ -175,6 +181,11 @@ def team_detail(request, team_id):
         )
     else:
         return redirect("home")
+
+
+@login_required(login_url="authorization")
+def team_detail_test(request):
+    return render(request, "team_detail_test.html")
 
 
 def profile(request):

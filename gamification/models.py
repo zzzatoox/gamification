@@ -5,6 +5,7 @@ from django.utils import timezone
 
 # Create your models here.
 class User(AbstractUser):
+    patronymic = models.CharField(max_length=150, null=True, blank=True)
     photo = models.ImageField(upload_to="photos/", null=True, blank=True)
     xp = models.IntegerField(default=0, null=False)
     level = models.IntegerField(default=1, null=False)

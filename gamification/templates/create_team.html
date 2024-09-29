@@ -1,0 +1,36 @@
+{% extends 'main_template.html' %}
+{% load static %}
+
+{% block head %}
+<title>Создание команды</title>
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+{% endblock %}
+
+{% block body %}
+
+<body>
+  <div class="container">
+    <h2>Создание команды</h2>
+    <form class="row g-3 needs-validation" novalidate method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="col-md-6">
+        <label for="id_title" class="form-label">Название команды (*)</label>
+        <input type="text" maxlength="30" class="form-control" id="id_title" name="title" required>
+        <div class="invalid-feedback">
+          Пожалуйста, введите название команды.
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label for="id_photo" class="form-label">Фото команды</label>
+        <input type="file" class="form-control" id="id_photo" name="photo" accept="image/*">
+        <div class="invalid-feedback">
+          Пожалуйста, загрузите фото команды.
+        </div>
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary" type="submit">Создать команду</button>
+      </div>
+    </form>
+  </div>
+</body>
+{% endblock %}

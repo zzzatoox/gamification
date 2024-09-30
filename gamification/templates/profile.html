@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block head %}
-<title>Профиль {username}</title>
+<title>Профиль {{ user_info.username }}</title>
 <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 {% endblock %}
 
@@ -15,8 +15,7 @@
         <div class="col-lg-4">
           <div class="card mb-4">
             <div class="card-body text-center">
-              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" alt="avatar"
-                class="img-fluid" style="width: 150px; height: 165px;">
+              <img src="{{ user_photo_url }}" alt="User Photo" class="img-fluid" style="width: 150px; height: 165px;">
               <h5 class="my-3">{{user_info.username}}</h5>
               <div class="mb-2">
                 <p class="mt-4 mb-1" style="font-size: .77rem;">
@@ -67,11 +66,13 @@
               </div>
             </div>
           </div>
+          {% if is_user_owner %}
           <div class="row">
             <div class="col">
               <div class="card mb-4 mb-md-0">
                 <div class="card-body">
                   <h3>Текущие задания</h3>
+                  {% for task in tasks %}
                   <div class="card m-1 mb-2">
                     <div class="row align-items-center">
                       <div class="col-2 m-1">
@@ -79,27 +80,18 @@
                           class="card-img-top rounded-circle mx-auto d-block m-1" style="width: 100px; height: 100px;">
                       </div>
                       <div class="col-6" style="font-size: 14.5pt;">
-                        <p>Разработка API Motiv8</p>
+                        <p>{{ task.task.title }}</p>
                       </div>
-                      <div class="col-3" style="font-size: 14pt;">140 xp</div>
+                      <div class="col-3" style="font-size: 14pt;">{{ task.task.xp_reward }} xp /
+                        {{ task.task.coins_reward }} coins</div>
                     </div>
                   </div>
-                  <div class="card m-1">
-                    <div class="row align-items-center">
-                      <div class="col-2 m-1">
-                        <img src="https://via.placeholder.com/100"
-                          class="card-img-top rounded-circle mx-auto d-block m-1" style="width: 100px; height: 100px;">
-                      </div>
-                      <div class="col-6" style="font-size: 14.5pt;">
-                        <p>Тестирование и отладка программы "Motiv8 PRO"</p>
-                      </div>
-                      <div class="col-3" style="font-size: 14pt;">140 xp</div>
-                    </div>
-                  </div>
+                  {% endfor %}
                 </div>
               </div>
             </div>
           </div>
+          {% endif %}
         </div>
       </div>
     </div>

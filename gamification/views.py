@@ -6,6 +6,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.forms import PasswordResetForm
+from django.conf import settings
 
 from .forms import CreateTaskForm
 
@@ -153,12 +154,43 @@ def create_team(request):
 
 
 def ratings_teams(request):
-    team_list = Team.objects.get().order_by("xp")
-    return render(request, "ratings_teams.html", {"teams": team_list})
+    team_list = Team.objects.all().order_by("-xp")
+
+    top_teams = team_list[:3]
+    if len(top_teams) == 1:
+        top_teams_ordered = [top_teams[0]]
+    elif len(top_teams) == 2:
+        top_teams_ordered = [top_teams[1], top_teams[0]]
+    else:
+        top_teams_ordered = [top_teams[1], top_teams[0], top_teams[2]]
+
+    other_teams = team_list[3:]
+
+    return render(
+        request,
+        "ratings_teams.html",
+        {"top_teams": top_teams_ordered, "other_teams": other_teams},
+    )
 
 
 def ratings_users(request):
-    return render(request, "ratings_users.html")
+    user_list = UserProfile.objects.all().order_by("-xp")
+
+    top_users = user_list[:3]
+    if len(top_users) == 1:
+        top_users_ordered = [top_users[0]]
+    elif len(top_users) == 2:
+        top_users_ordered = [top_users[1], top_users[0]]
+    else:
+        top_users_ordered = [top_users[1], top_users[0], top_users[2]]
+
+    other_users = user_list[3:]
+
+    return render(
+        request,
+        "ratings_users.html",
+        {"top_users": top_users_ordered, "other_users": other_users},
+    )
 
 
 @login_required
@@ -189,6 +221,13 @@ def team_detail_test(request):
     return render(request, "team_detail_test.html")
 
 
+def get_user_photo_url(user):
+    if user.photo:
+        return user.photo.url
+    else:
+        return settings.STATIC_URL + "images/placeholder.jpg"
+
+
 def profile(request, user_id):
     user = request.user
     is_user_owner = user.id == user_id
@@ -208,12 +247,24 @@ def profile(request, user_id):
                 "achievements": achievements,
                 "tasks": tasks,
                 "is_user_owner": True,
+                "user_photo_url": get_user_photo_url(user_info),
             },
         )
     else:
         user_info = User.objects.get(id=user_id)
+        user_game_info = UserProfile.objects.get(user=user_info)
+        achievements = AchievementEmployee.objects.filter(employee=user_info)
+
         return render(
-            request, "profile.html", {"user_info": user_info, "is_user_owner": False}
+            request,
+            "profile.html",
+            {
+                "user_info": user_info,
+                "user_game_info": user_game_info,
+                "achievements": achievements,
+                "is_user_owner": False,
+                "user_photo_url": get_user_photo_url(user_info),
+            },
         )
 
 

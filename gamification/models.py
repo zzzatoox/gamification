@@ -53,6 +53,11 @@ class Task(models.Model):
         verbose_name="Награда за выполнение (XP)",
         help_text="Количество опыта за выполнение задачи",
     )
+    coins_reward = models.PositiveIntegerField(
+        null=False,
+        verbose_name="Награда за выполнение (монеты)",
+        help_text="Количество монет за выполнение задачи",
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
         null=False,

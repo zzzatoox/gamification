@@ -5,7 +5,6 @@
 <title>Главная</title>
 <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 <style>
-
     .podium {
         display: flex;
         justify-content: center;
@@ -13,6 +12,7 @@
         height: 300px;
         margin-bottom: 20px;
     }
+
     .podium-step {
         display: flex;
         flex-direction: column;
@@ -21,61 +21,65 @@
         width: 200px;
         text-align: center;
     }
+
     .podium-step img {
         width: 80px;
         height: 80px;
         border-radius: 50%;
         margin-bottom: 10px;
     }
+
     .podium-step .position {
         font-size: 24px;
         font-weight: bold;
     }
+
     .podium-step .team-name {
         font-size: 18px;
     }
+
     .podium-step:nth-child(1) {
         height: 100px;
         background-color: #c0c0c0;
         box-shadow: inset 0 0 3rem rgba(0, 0, 0, .1)
     }
+
     .podium-step:nth-child(2) {
         height: 150px;
         background-color: #ffd900;
         box-shadow: inset 0 0 3rem rgba(0, 0, 0, .1)
     }
+
     .podium-step:nth-child(3) {
         height: 50px;
         background-color: #ff8000;
         box-shadow: inset 0 0 3rem rgba(0, 0, 0, .1)
     }
-
 </style>
 {% endblock %}
 
 
 {% block body %}
-<body >
+
+<body>
     <div class="container mt-4">
         <h1 class="text-center mb-4">Лидеры среди команд</h1>
 
-    <!-- Пьедестал -->
+        <!-- Пьедестал -->
         <div class="podium">
+            {% for team in top_teams %}
             <div class="podium-step">
+                {% if forloop.counter == 1 %}
                 <div class="position">2</div>
-                <img src="https://via.placeholder.com/80" alt="Команда 2">
-                <div class="team-name">Команда 2</div>
-            </div>
-            <div class="podium-step">
+                {% elif forloop.counter == 2 %}
                 <div class="position">1</div>
-                <img src="https://via.placeholder.com/80" alt="Команда 1">
-                <div class="team-name">Команда 1</div>
-            </div>
-            <div class="podium-step">
+                {% elif forloop.counter == 3 %}
                 <div class="position">3</div>
-                <img src="https://via.placeholder.com/80" alt="Команда 3">
-                <div class="team-name">Команда 3</div>
+                {% endif %}
+                <img src="https://via.placeholder.com/80" alt="{{ team.title }}">
+                <div class="team-name">{{ team.title }}</div>
             </div>
+            {% endfor %}
         </div>
 
         <!-- Таблица с остальными командами -->
@@ -88,31 +92,13 @@
                 </tr>
             </thead>
             <tbody>
+                {% for team in other_teams %}
                 <tr>
-                    <td>4</td>
-                    <td>Команда 4</td>
-                    <td>120</td>
+                    <td>{{ forloop.counter|add:3 }}</td>
+                    <td>{{ team.title }}</td>
+                    <td>{{ team.xp }}</td>
                 </tr>
-                <tr>
-                    <td>5</td>
-                    <td>Команда 5</td>
-                    <td>110</td>
-                </tr>
-                <tr>
-                    <td>6</td>
-                    <td>Команда 6</td>
-                    <td>100</td>
-                </tr>
-                <tr>
-                    <td>7</td>
-                    <td>Команда 7</td>
-                    <td>90</td>
-                </tr>
-                <tr>
-                    <td>8</td>
-                    <td>Команда 8</td>
-                    <td>80</td>
-                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

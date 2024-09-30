@@ -15,7 +15,6 @@
         background-color: #f8f9fa;
         border-radius: 5px;
         padding: 15px;
-        min-width: 300px;
     }
     .scrum-card {
         background-color: #fff;
@@ -23,6 +22,7 @@
         border-radius: 5px;
         padding: 15px;
         margin-bottom: 15px;
+        cursor: pointer;
     }
 </style>
 {% endblock %}
@@ -32,13 +32,14 @@
     <section style="background-color: #eee;">
         <div class="container py-5">
           <div class="row">
-            <!-- Блок с профилем команды -->
             <div class="col-lg-4">
+            <!-- Блок с профилем команды -->
               <div class="card mb-4">
                 <div class="card-body text-center">
                   <img src="https://via.placeholder.com/150" alt="avatar"
                     class="img-fluid" style="width: 150px; height: 165px;">
                   <h5 class="my-3">Ядерные мыши</h5>
+                  <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#EditTeamProfile"> Редактировать </button>
                   <div class="mb-2">
                     <p class="mt-4 mb-1" style="font-size: .77rem;">{Level team}</p>
                       <div class="progress rounded mb-2" style="height: 5px;">
@@ -66,9 +67,18 @@
               <div class="row">
                 <div class="col">
                   <div class="card mb-4 mb-md-0">
-                      <h3 class=" ms-4 mt-2">Участники</h3>
-                    <div class="card-body" style="overflow-y: auto; height:330px;">
-                      <div class="card ms-1 me-1 mb-2">
+                    <div class="row">
+                        <div class="col-2"></div>
+                        <div class="col-4">
+                            <h3 class=" ms-4 mt-2">Участники</h3>
+                        </div>
+                        <div class="col-4">
+                            <button class="btn btn-outline-dark mt-2" data-bs-toggle="modal" data-bs-target="#InviteUser">Пригласить</button>
+                        </div>
+                    </div>
+                    <div class="card-body" style="overflow-y: auto; height:382px;">
+                        <!-- Карточка участника -->
+                      <div class="card ms-1 me-1 mb-1">
                         <div class="row align-items-center">
                           <div class="col-2 m-1">
                             <img src="https://via.placeholder.com/50" class="card-img-top rounded-circle mx-auto d-block m-1" style="width: 50px; height: 50px;">
@@ -76,42 +86,13 @@
                           <div class="col-6" style="font-size: 14.5pt;">
                             <p>Шляпкин Антон Александрович</p>
                           </div>
-                          <div class="col-3" style="font-size: 14pt;">Создатель</div>
+                          <div class="col-2" style="font-size: 14pt;">Создатель</div>
+                          <div class="col-1">
+                            <button class="btn btn-sm btn-outline-dark">Х</button>
+                          </div>
                         </div>
                       </div>  
-                      <div class="card ms-1 me-1 mb-2">
-                        <div class="row align-items-center">
-                          <div class="col-2 m-1">
-                            <img src="https://via.placeholder.com/50" class="card-img-top rounded-circle mx-auto d-block m-1" style="width: 50px; height: 50px;">
-                          </div>
-                          <div class="col-6" style="font-size: 14.5pt;">
-                            <p>Шляпкин Антон Александрович</p>
-                          </div>
-                          <div class="col-3" style="font-size: 14pt;">Рыцарь 1-го ордена</div>
-                        </div>
-                      </div>
-                      <div class="card ms-1 me-1 mb-2">
-                        <div class="row align-items-center">
-                          <div class="col-2 m-1">
-                            <img src="https://via.placeholder.com/50" class="card-img-top rounded-circle mx-auto d-block m-1" style="width: 50px; height: 50px;">
-                          </div>
-                          <div class="col-6" style="font-size: 14.5pt;">
-                            <p>Шляпкин Антон Александрович</p>
-                          </div>
-                          <div class="col-3" style="font-size: 14pt;">Рыцарь 2-го ордена</div>
-                        </div>
-                      </div>
-                      <div class="card ms-1 me-1 mb-2">
-                        <div class="row align-items-center">
-                          <div class="col-2 m-1">
-                            <img src="https://via.placeholder.com/50" class="card-img-top rounded-circle mx-auto d-block m-1" style="width: 50px; height: 50px;">
-                          </div>
-                          <div class="col-6" style="font-size: 14.5pt;">
-                            <p>Шляпкин Антон Александрович</p>
-                          </div>
-                          <div class="col-3" style="font-size: 14pt;">Меченосец</div>
-                        </div>
-                      </div>
+                      
                     </div>
                   </div>
                 </div>
@@ -119,33 +100,76 @@
             </div>
             <!-- Scrum-доска -->
             <div class="container">
-                <h1 class="text-center mb-4">Задачи команды</h1>
-                <div class="scrum-board">
-                    <div class="scrum-column">
-                        <h2 class="text-center">To Do</h2>
-                        <div class="scrum-card">
-                            <h5>Задача 1</h5>
-                            <p>Описание задачи 1...</p>
+                <div class="card">
+                    <div class="row d-flex justify-content-center align-items-center">
+                        <div class="col-2"></div>
+                        <div class="col-4 text-center m-2">
+                            <h1>Задачи команды</h1>
                         </div>
-                        <div class="scrum-card">
-                            <h5>Задача 2</h5>
-                            <p>Описание задачи 2...</p>
+                        <div class="col-2 text-end">
+                            <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#CreateTaskModal">Создать задачу</button>
                         </div>
                     </div>
-            
-                    <div class="scrum-column">
-                        <h2 class="text-center">In Progress</h2>
-                        <div class="scrum-card">
-                            <h5>Задача 3</h5>
-                            <p>Описание задачи 3...</p>
+                    <div class="scrum-board">
+                        <div class="scrum-column">
+                            <h2 class="text-center">В ожидании</h2>
+                            <div class="scrum-card">
+                                <div class="row">
+                                    <div class="col-10">
+                                        <h5>Задача 1</h5>
+                                    </div>
+                                    <div class="col-2">
+                                        <button class="btn btn-sm btn-outline-dark">X</button>
+                                    </div>
+                                    <div class="row"></div>
+                                        <p>Описание задачи 1...</p>
+                                    </div>
+                            </div>
+                            <div class="scrum-card">
+                                <div class="row">
+                                    <div class="col-10">
+                                        <h5>Задача 2</h5>
+                                    </div>
+                                    <div class="col-2">
+                                        <button class="btn btn-sm btn-outline-dark">X</button>
+                                    </div>
+                                    <div class="row"></div>
+                                        <p>Описание задачи 2...</p>
+                                    </div>
+                            </div>
                         </div>
-                    </div>
-            
-                    <div class="scrum-column">
-                        <h2 class="text-center">Done</h2>
-                        <div class="scrum-card">
-                            <h5>Задача 4</h5>
-                            <p>Описание задачи 4...</p>
+                
+                        <div class="scrum-column">
+                            <h2 class="text-center">В процессе</h2>
+                            <div class="scrum-card">
+                                <div class="row">
+                                    <div class="col-10">
+                                        <h5>Задача 3</h5>
+                                    </div>
+                                    <div class="col-2">
+                                        <button class="btn btn-sm btn-outline-dark">X</button>
+                                    </div>
+                                    <div class="row"></div>
+                                        <p>Описание задачи 3...</p>
+                                    </div>
+                            </div>
+                        </div>
+                
+                        <div class="scrum-column">
+                            <h2 class="text-center">Выполнено</h2>
+                            <div class="scrum-card">
+                                <div class="row">
+                                    <div class="col-10">
+                                        <h5>Задача 4</h5>
+                                    </div>
+                                    <div class="col-2">
+                                        <button class="btn btn-sm btn-outline-dark">X</button>
+                                    </div>
+                                    <div class="row"></div>
+                                        <p>Описание задачи 4...</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -154,34 +178,154 @@
         </div>
       </section>    
 
-      <!-- Modal-window Achievements -->
-       <div class="modal fade" id="modalId" tabindex="-1" role="dialog"
-        aria-labelledby="modalTitleId"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-sm" role="document">
+      <!-- Modal-window CreateTasks -->
+       <div class="modal fade" id="CreateTaskModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="modalTitleId">Выполнить 5 задач за день</h5>
+              <h5 class="modal-title">Создание задачи</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">Ого! Вы такой трудолюбивый, что выполнили 5 задач за один рабочий день! Поздравляем, так держать!
-              <div class="d-flex "></div>
-              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" alt="avatar"
-                      class="img-fluid" style="width: 150px; height: 165px;">
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary">ОК</button>
+            <div class="modal-body">
+              <form>
+                <div class="mb-3">
+                  <label for="recipient-name" class="col-form-label">Название:</label>
+                  <input type="text" class="form-control" id="recipient-name">
+                </div>
+                <div class="mb-3">
+                  <label for="message-text" class="col-form-label">Описание</label>
+                  <textarea class="form-control" id="message-text"></textarea>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="task-executor-tb" placeholder="Выберите исполнителя">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Участники</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <!-- Можно как-то придумать хранение id-шников в data-value -->
+                        <!-- Загружать сюда данные только участников команды -->
+                      <li><a class="dropdown-item" href="#" data-value="1">Шляпкин Антон Александрович</a></li>
+                      <li><a class="dropdown-item" href="#" data-value="2">Наталья Морская Пехота</a></li>
+                      <li><a class="dropdown-item" href="#" data-value="3">Жмышенко Валерий Альбертович</a></li>
+                    </ul>
+                </div>
+                <div class="container d-flex justify-content-end"></div>
+                  <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
+                  <button type="submit" class="btn btn-primary m-1">Создать</button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
-       </div>
+      </div>
 
-       <script>
-        const myModal = new bootstrap.Modal(
-          document.getElementById("modalId"),
-          options,
-        );
-       </script>
+
+      <!-- Modal-window EditTeamProfile -->
+      <div class="modal fade" id="EditTeamProfile" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Редактирование команды</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="mb-3">
+                  <label for="recipient-name" class="col-form-label">Название:</label>
+                  <input type="text" class="form-control" id="team-name-tb">
+                </div>
+                <div class="mb-3">
+                  <label for="message-text" class="col-form-label">Фото:</label>
+                  <input class="form-control" type="file" id="photo-team-profile-tb">
+                </div>
+                <div class="container d-flex justify-content-end">
+                    <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary m-1">Создать</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Modal-window InviteUser -->
+      <div class="modal fade" id="InviteUser" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Приглашение в команду</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="invite-user-tb" placeholder="Кого вы хотите пригласить?">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Пользователи</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                      <li><a class="dropdown-item" href="#" data-value="1">Шляпкин Антон Александрович</a></li>
+                      <li><a class="dropdown-item" href="#" data-value="2">Наталья Морская Пехота</a></li>
+                      <li><a class="dropdown-item" href="#" data-value="3">Жмышенко Валерий </a></li>
+                    </ul>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+       <!-- Modal-window TaskDetail -->
+       <div class="modal fade" id="TaskDetail" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Подробнее о задаче</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Название</label>
+                    <input type="text" class="form-control" id="task-detail-name-tb" >
+                  </div>
+                  <div class="mb-3">
+                    <label  class="form-label">Описание</label>
+                    <textarea class="form-control" id="task-detail-description-tb" rows="3"></textarea>
+                  </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <script>
+        document.querySelectorAll('#CreateTaskModal .dropdown-item').forEach(item => {
+          item.addEventListener('click', event => {
+            event.preventDefault();
+            document.getElementById('task-executor-tb').value = event.target.innerText;
+          });
+        });
+        document.querySelectorAll('#InviteUser .dropdown-item').forEach(item => {
+          item.addEventListener('click', event => {
+            event.preventDefault();
+            document.getElementById('invite-user-tb').value = event.target.innerText;
+          });
+        });
+
+
+        //Здесь и крестик тоже вызывает модальное окно
+        document.querySelectorAll('.scrum-card').forEach(item => {
+            const title = item.querySelector('h5').innerText;
+            const description = item.querySelector('p').innerText;
+            item.dataset.bsToggle = "modal";
+            item.dataset.bsTarget = "#TaskDetail";
+            item.addEventListener('click', () => fillTaskDetail(title, description));
+        });
+        function fillTaskDetail(title, description){
+            document.getElementById('task-detail-name-tb').value = title;
+            document.getElementById('task-detail-description-tb').value = description;
+        };
+
+        document.getElementsByClassName()
+      </script>
        
 
 </body>

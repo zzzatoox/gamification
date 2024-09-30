@@ -12,6 +12,10 @@
   .nav-tabs .nav-link.active {
     color: black;
   }
+
+  .card-link{
+    text-decoration: none;
+  }
 </style>
 {% endblock %}
 
@@ -48,10 +52,11 @@
         {% for team in owned_teams %}
         <div class="row">
           <div class="col">
-            <div class="card mb-4 mb-md-0" style="border:none;">
-              <div class="card-body">
-                <div class="card m-1 mb-2">
-                  <div class="row align-items-center team-row" style="font-size: 14pt;">
+              <div class="card mb-4 mb-md-0" style="border:none;">
+                  <div class="card-body">
+                      <a href="{% url 'team_detail_test' team.team_id %}" class="card-link">
+                      <div class="card m-1 mb-2">
+                          <div class="row align-items-center" style="font-size: 14pt;">
                     <div class="col-2 m-1 ">
                       <img src="https://via.placeholder.com/100" class="card-img-top mx-auto d-block m-1"
                         style="width: 100px; height: 100px;">
@@ -63,6 +68,7 @@
                     <div class="col-3">{{ team.xp }} xp</div>
                   </div>
                 </div>
+                </a>
               </div>
             </div>
           </div>
@@ -73,10 +79,11 @@
         {% for team in member_teams %}
         <div class="row">
           <div class="col">
-            <div class="card mb-4 mb-md-0" style="border:none;">
-              <div class="card-body">
-                <div class="card m-1 mb-2">
-                  <div class="row align-items-center team-row" style="font-size: 14pt;">
+              <div class="card mb-4 mb-md-0" style="border:none;">
+                  <div class="card-body">
+                      <a href="{% url 'team_detail_test' team.team.team_id %}" class="card-link">
+                      <div class="card m-1 mb-2">
+                  <div class="row align-items-center" style="font-size: 14pt;">
                     <div class="col-2 m-1 ">
                       <img src="https://via.placeholder.com/100" class="card-img-top mx-auto d-block m-1"
                         style="width: 100px; height: 100px;">
@@ -88,6 +95,7 @@
                     <div class="col-3">{{ team.team.xp }} xp</div>
                   </div>
                 </div>
+               </a>
               </div>
             </div>
           </div>
@@ -124,20 +132,7 @@
 
 
 {% block js-scripts %}
-<script>
-  document.querySelectorAll('.scrum-card').forEach(item => {
-    const title = item.querySelector('h5').innerText;
-    const description = item.querySelector('p').innerText;
-    item.dataset.bsToggle = "modal";
-    item.dataset.bsTarget = "#TaskDetail";
-    item.addEventListener('click', () => fillTaskDetail(title, description));
-  });
-  function fillTaskDetail(title, description) {
-    document.getElementById('task-detail-name-tb').value = title;
-    document.getElementById('task-detail-description-tb').value = description;
-  };
 
-</script>
 
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 {% endblock %}

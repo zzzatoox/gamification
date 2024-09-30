@@ -136,7 +136,7 @@ def forgot_password(request):
 def get_teams(request):
     user = request.user
     owned_teams = Team.objects.filter(owner=user)
-    member_teams = TeamEmployee.objects.filter(employee=user)
+    member_teams = TeamEmployee.objects.filter(employee=user).exclude(team__owner=user)
     return render(
         request,
         "teams.html",

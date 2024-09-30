@@ -18,6 +18,7 @@ from .models import (
     AchievementEmployee,
     Task,
     TaskEmployee,
+    UserProfile,
 )
 
 
@@ -188,69 +189,32 @@ def team_detail_test(request):
     return render(request, "team_detail_test.html")
 
 
-def profile(request):
-    # Проверять, является ли пользователь владельцем своей страницы, и выдавать соотв. функционал
-    user = request.user
-    user_obj = User.objects.filter(id=user.id).exists()
-
-    if user_obj:
-        user_info = User.objects.get(id=user.id)
-        achievements = AchievementEmployee.objects.filter(
-            employee=user_info
-        ).values_list("achievement", flat=True)
-        achievements_obj = Achievement.objects.filter(id__in=achievements)
-        return render(
-            request,
-            "profile.html",
-            {"user_info": user_info, "achievements": achievements_obj},
-        )
-    else:
-        return redirect("home")
-
-
-@login_required
-def profile_with_id(request, user_id):
-    # Проверять, является ли пользователь владельцем своей страницы, и выдавать соотв. функционал
+def profile(request, user_id):
     user = request.user
     is_user_owner = user.id == user_id
 
     if is_user_owner:
-        user_info = User.objects.get(id=user_id)
+        user_info = User.objects.get(id=user.id)
+        user_game_info = UserProfile.objects.get(user=user_info)
+        tasks = TaskEmployee.objects.filter(employee=user_info)
+        achievements = AchievementEmployee.objects.filter(employee=user_info)
+
         return render(
-            request, "profile.html", {"user_info": user_info, "is_user_owner": True}
+            request,
+            "profile.html",
+            {
+                "user_info": user_info,
+                "user_game_info": user_game_info,
+                "achievements": achievements,
+                "tasks": tasks,
+                "is_user_owner": True,
+            },
         )
     else:
+        user_info = User.objects.get(id=user_id)
         return render(
             request, "profile.html", {"user_info": user_info, "is_user_owner": False}
         )
-
-
-# @login_required
-# def create_task(request):
-#     if request.method == "POST":
-#         title = request.POST.get("title")
-#         description = request.POST.get("description")
-#         deadline = request.POST.get("deadline")
-#         assigned_to = request.POST.get("assigned_to")
-
-#         task = Task.objects.create(
-#             title=title,
-#             description=description,
-#             deadline=deadline,
-#         )
-#         if assigned_to:
-#             TaskEmployee.objects.create(
-#                 task=task, employee=User.objects.get(id=assigned_to)
-#             )
-
-#         return redirect("task_detail", task_id=task.id)
-#         # else:
-#         # return render(
-#         #     request,
-#         #     "create_task.html",
-#         #     {"error_message": "Поле назначение сотрудника не заполнено"},
-#         # )
-#     return render(request, "create_task.html")
 
 
 @login_required

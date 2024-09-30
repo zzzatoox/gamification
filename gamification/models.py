@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 
@@ -33,7 +33,8 @@ class User(AbstractUser):
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        UserProfile.objects.create(user=instance)
+        first_rank = Rank.objects.order_by("level").first()
+        UserProfile.objects.create(user=instance, rank=first_rank)
 
 
 class Task(models.Model):
@@ -47,7 +48,7 @@ class Task(models.Model):
     description = models.TextField(
         null=True, blank=True, verbose_name="Описание", help_text="Описание задачи"
     )
-    xp_reward = models.IntegerField(
+    xp_reward = models.PositiveIntegerField(
         null=False,
         verbose_name="Награда за выполнение (XP)",
         help_text="Количество опыта за выполнение задачи",
@@ -95,10 +96,15 @@ class Achievement(models.Model):
         verbose_name="Описание",
         help_text="Описание достижения",
     )
-    xp_reward = models.IntegerField(
+    xp_reward = models.PositiveIntegerField(
         null=False,
         verbose_name="Награда за выполнение (XP)",
         help_text="Количество опыта за получение достижения",
+    )
+    coins_reward = models.PositiveIntegerField(
+        null=True,
+        verbose_name="Награда за выполнение (монеты)",
+        help_text="Количество монет за получение достижения",
     )
 
     def __str__(self):
@@ -138,6 +144,12 @@ class Team(models.Model):
         verbose_name="Дата создания",
         help_text="Дата создания команды",
     )
+    xp = models.PositiveIntegerField(
+        null=False,
+        default=0,
+        verbose_name="Опыт",
+        help_text="Опыт команды",
+    )
 
     def __str__(self):
         return self.title
@@ -145,6 +157,11 @@ class Team(models.Model):
     class Meta:
         verbose_name = "Команда"
         verbose_name_plural = "Команды"
+
+    def update_xp(self):
+        total_xp = sum(member.employee.userprofile.xp for member in self.members.all())
+        self.xp = total_xp
+        self.save()
 
 
 class TeamEmployee(models.Model):
@@ -170,6 +187,16 @@ class TeamEmployee(models.Model):
         unique_together = ("team", "employee")
         verbose_name = "Член команды"
         verbose_name_plural = "Члены команды"
+
+
+@receiver(post_save, sender=TeamEmployee)
+def update_team_xp_on_join(sender, instance, **kwargs):
+    instance.team.update_xp()
+
+
+@receiver(post_delete, sender=TeamEmployee)
+def update_team_xp_on_leave(sender, instance, **kwargs):
+    instance.team.update_xp()
 
 
 class AchievementEmployee(models.Model):
@@ -201,6 +228,17 @@ class AchievementEmployee(models.Model):
         unique_together = ("achievement", "employee")
         verbose_name = "Полученное достижение"
         verbose_name_plural = "Полученные достижения"
+
+
+@receiver(post_save, sender=AchievementEmployee)
+def update_user_profile_on_achievement(sender, instance, **kwargs):
+    user_profile = instance.employee.userprofile
+    achievement = instance.achievement
+    user_profile.xp += achievement.xp_reward
+    if achievement.coins_reward:
+        user_profile.coins += achievement.coins_reward
+    user_profile.update_rank()
+    user_profile.save()
 
 
 class TaskEmployee(models.Model):
@@ -260,7 +298,7 @@ class Product(models.Model):
         verbose_name="Описание",
         help_text="Описание товара",
     )
-    price = models.IntegerField(
+    price = models.PositiveIntegerField(
         default=0,
         null=False,
         verbose_name="Цена",
@@ -365,6 +403,7 @@ class UserProfile(models.Model):
     )
     rank = models.ForeignKey(
         Rank,
+        default=1,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

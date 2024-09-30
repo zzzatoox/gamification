@@ -25,7 +25,7 @@
                 {% if user.is_authenticated %}
                 <li class="nav-item m-2">
                     {% if is_in_team %}
-                    <a class="nav-link active" href="{% url 'team_detail_test' %}">Моя команда</a> 
+                    <a class="nav-link active" href="{% url 'team_detail_test' %}">Моя команда</a>
                     {% else %}
                     <a class="nav-link active" href="{% url 'create_team' %}">Создать команду</a>
                     {% endif %}
@@ -35,7 +35,7 @@
             <ul class="navbar-nav  m-2 mb-lg-0">
                 {% if user.is_authenticated %}
                 <li class="nav-item m-2">
-                    <a class="nav-link active" href="{% url 'profile' %}">{user.login}</a>
+                    <a class="nav-link active" href="{% url 'profile' user.id %}">{{user.username}}</a>
                 </li>
                 <li class="nav-item m-2">
                     <a class="nav-link active" href="{% url 'logout' %}">Выход</a>

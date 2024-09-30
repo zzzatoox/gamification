@@ -13,8 +13,8 @@ urlpatterns = [
     path("create_team/", views.create_team, name="create_team"),
     path("teams/", views.get_teams, name="teams"),
     path("team_detail/<int:team_id>", views.team_detail, name="team_detail"),
-    path("profile/", views.profile, name="profile"),
-    path("profile/<int:user_id>", views.profile_with_id, name="profile_with_id"),
+    # path("profile/", views.profile, name="profile"),
+    path("profile/<int:user_id>", views.profile, name="profile"),
     path("ratings_teams/", views.ratings_teams, name="ratings_teams"),
     path("ratings_users/", views.ratings_users, name="ratings_users"),
 ]

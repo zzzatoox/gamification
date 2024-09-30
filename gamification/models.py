@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 # Create your models here.
@@ -19,21 +21,6 @@ class User(AbstractUser):
         verbose_name="Фото",
         help_text="Фотография пользователя",
     )
-    xp = models.IntegerField(
-        default=0,
-        null=False,
-        verbose_name="Опыт",
-        help_text="Кол-во опыта пользователя",
-    )
-    level = models.IntegerField(
-        default=1, null=False, verbose_name="Уровень", help_text="Уровень пользователя"
-    )
-    money = models.IntegerField(
-        default=0,
-        null=False,
-        verbose_name="Монеты",
-        help_text="Кол-во опыта пользователя",
-    )
 
     def __str__(self):
         return self.username
@@ -41,6 +28,12 @@ class User(AbstractUser):
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
 
 
 class Task(models.Model):
@@ -251,3 +244,159 @@ class TaskEmployee(models.Model):
         unique_together = ("task", "employee")
         verbose_name = "Назначение задачи"
         verbose_name_plural = "Назначение задач"
+
+
+class Product(models.Model):
+    product_id = models.AutoField(primary_key=True, verbose_name="ID товара")
+    title = models.CharField(
+        max_length=50,
+        null=False,
+        verbose_name="Название",
+        help_text="Название товара",
+    )
+    description = models.TextField(
+        null=True,
+        blank=True,
+        verbose_name="Описание",
+        help_text="Описание товара",
+    )
+    price = models.IntegerField(
+        default=0,
+        null=False,
+        verbose_name="Цена",
+        help_text="Цена товара",
+    )
+    image = models.ImageField(
+        upload_to="products/",
+        null=True,
+        blank=True,
+        verbose_name="Фото",
+        help_text="Фотография достижения",
+    )
+    is_available = models.BooleanField(
+        default=True,
+        null=False,
+        verbose_name="Доступен",
+        help_text="Флаг, показывающий, доступен ли товар",
+    )
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = "Товар"
+        verbose_name_plural = "Товары"
+        ordering = ["-price"]
+
+
+class Inventory(models.Model):
+    inventory_id = models.AutoField(primary_key=True, verbose_name="ID инвентаря")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, verbose_name="Пользователь"
+    )
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Товар")
+    quantity = models.PositiveIntegerField(default=1, verbose_name="Количество")
+    date_added = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.product.title} ({self.quantity})"
+
+    class Meta:
+        verbose_name = "Инвентарь"
+        verbose_name_plural = "Инвентари"
+        ordering = ["-date_added"]
+
+
+class Notification(models.Model):
+    notification_id = models.AutoField(primary_key=True, verbose_name="ID уведомления")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, verbose_name="Пользователь"
+    )
+    message = models.TextField(verbose_name="Сообщение")
+    is_read = models.BooleanField(default=False, verbose_name="Прочитано")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+
+    def __str__(self):
+        return f"{self.user.username} - {self.message[:50]}"
+
+    class Meta:
+        verbose_name = "Уведомление"
+        verbose_name_plural = "Уведомления"
+        ordering = ["-created_at"]
+
+
+class Rank(models.Model):
+    rank_id = models.AutoField(primary_key=True, verbose_name="ID звания")
+    title = models.CharField(max_length=50, verbose_name="Звание")
+    level = models.PositiveIntegerField(verbose_name="Уровень")
+    required_xp = models.PositiveIntegerField(verbose_name="Требуемый опыт")
+    bonus_coins = models.PositiveIntegerField(verbose_name="Надбавка (монеты)")
+
+    def __str__(self):
+        return f"{self.title} (Уровень {self.level})"
+
+    class Meta:
+        verbose_name = "Звание"
+        verbose_name_plural = "Звания"
+        ordering = ["level"]
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, verbose_name="Пользователь"
+    )
+    xp = models.PositiveIntegerField(
+        default=0,
+        null=False,
+        verbose_name="Опыт",
+        help_text="Кол-во опыта пользователя",
+    )
+    level = models.PositiveIntegerField(
+        default=1,
+        null=False,
+        verbose_name="Уровень",
+        help_text="Уровень пользователя",
+    )
+    coins = models.PositiveIntegerField(
+        default=0,
+        null=False,
+        verbose_name="Монеты",
+        help_text="Монеты пользователя",
+    )
+    rank = models.ForeignKey(
+        Rank,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Звание",
+        help_text="Звание пользователя",
+    )
+
+    def __str__(self):
+        return f"{self.user.username} (Уровень {self.level})"
+
+    class Meta:
+        verbose_name = "Профиль пользователя"
+        verbose_name_plural = "Профили пользователей"
+
+    def update_rank(self):
+        # Получаем все звания, отсортированные по уровню
+        ranks = Rank.objects.order_by("level")
+        for rank in ranks:
+            if self.xp >= rank.required_xp:
+                self.rank = rank
+                self.level = rank.level
+        self.save()
+
+    def complete_task(self, task_xp, task_coins):
+        # Добавляем опыт и монеты за задание
+        self.xp += task_xp
+        self.coins += task_coins
+
+        # Добавляем надбавку за звание
+        if self.rank:
+            self.coins += self.rank.bonus_coins
+
+        # Обновляем ранг и уровень
+        self.update_rank()
+        self.save()

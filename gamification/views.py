@@ -135,9 +135,13 @@ def forgot_password(request):
 @login_required
 def get_teams(request):
     user = request.user
-    teams = TeamEmployee.objects.filter(employee=user).values_list("team", flat=True)
-    teams = Team.objects.filter(team_id__in=teams)
-    return render(request, "teams.html", {"teams": teams})
+    owned_teams = Team.objects.filter(owner=user)
+    member_teams = TeamEmployee.objects.filter(employee=user)
+    return render(
+        request,
+        "teams.html",
+        {"owned_teams": owned_teams, "member_teams": member_teams},
+    )
 
 
 @login_required
@@ -217,8 +221,9 @@ def team_detail(request, team_id):
 
 
 @login_required(login_url="authorization")
-def team_detail_test(request):
-    return render(request, "team_detail_test.html")
+def team_detail_test(request, team_id):
+    team = Team.objects.get(team_id=team_id)
+    return render(request, "team_detail_test.html", {"team": team})
 
 
 def get_user_photo_url(user):

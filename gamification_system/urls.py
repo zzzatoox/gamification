@@ -22,6 +22,10 @@ from gamification import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("team_detail_test/", views.team_detail_test, name='team_detail_test'),
+    path(
+        "team_detail_test/<int:team_id>",
+        views.team_detail_test,
+        name="team_detail_test",
+    ),
     path("", include("gamification.urls")),
 ]

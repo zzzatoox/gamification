@@ -4,21 +4,132 @@
 {% block head %}
 <title>Главная</title>
 <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-
+<style>
+    .nav-tabs .nav-link {
+        color: rgb(28, 28, 28); 
+    }
+    .nav-tabs .nav-link.active {
+        color: black;
+    }
+</style>
 {% endblock %}
 
 
 {% block body %}
 
 <body>
-    <div class="container text-center align-items-center">
-        <h1>{}</h1>
+    <div class="container mt-5">
+        <div class="row" style="font-size: 14pt;">
+            <div class="col-3"></div>
+            <div class="col-6">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <div class="col-6">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="table1-tab" data-bs-toggle="tab" data-bs-target="#table1" type="button" role="tab" aria-controls="table1" aria-selected="true">Управление моими командами</button>
+                        </li>
+                    </div>
+                    <div class="col-6">    
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="table2-tab" data-bs-toggle="tab" data-bs-target="#table2" type="button" role="tab" aria-controls="table2" aria-selected="false">Команды, в которых я состою</button>
+                        </li>
+                    </div>
+                </ul>   
+            </div>
+            <div class="col-3">
+                <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#CreateTeam">Создать команду</button>
+            </div>
+        </div>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="table1" role="tabpanel" aria-labelledby="table1-tab">  
+                <div class="row">
+                    <div class="col">
+                      <div class="card mb-4 mb-md-0" style="border:none;">
+                        <div class="card-body">
+                          <div class="card m-1 mb-2">
+                            <div class="row align-items-center team-row" style="font-size: 14pt;">
+                              <div class="col-2 m-1 ">
+                                <img src="https://via.placeholder.com/100"
+                                  class="card-img-top mx-auto d-block m-1" style="width: 100px; height: 100px;">
+                              </div>
+                              <div class="col-3" style="font-size: 15pt;">
+                                <p>Крепкие орехи</p>
+                              </div>
+                              <div class="col-3">Участников 29</div>
+                              <div class="col-3">234000 xp</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="table2" role="tabpanel" aria-labelledby="table2-tab">
+                <div class="row">
+                    <div class="col">
+                      <div class="card mb-4 mb-md-0" style="border:none;">
+                        <div class="card-body">
+                          <div class="card m-1 mb-2">
+                            <div class="row align-items-center team-row" style="font-size: 14pt;">
+                              <div class="col-2 m-1 ">
+                                <img src="https://via.placeholder.com/100"
+                                  class="card-img-top mx-auto d-block m-1" style="width: 100px; height: 100px;">
+                              </div>
+                              <div class="col-3" style="font-size: 15pt;">
+                                <p>Саблезубые кальмары</p>
+                              </div>
+                              <div class="col-3">Участников 320</div>
+                              <div class="col-3">234000 xp</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
+    <!-- Modal-window TaskDetail -->
+    <div class="modal fade" id="CreateTeam" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Создание команды</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Название</label>
+                    <input type="text" class="form-control" id="create-team-name-tb" >
+                  </div>
+                  <div class="mb-3">
+                    <label  class="form-label">Фотография</label>
+                    <input type="file" class="form-control" id="create-team-photo-tb" accept="image/*" rows="3"></input>
+                  </div>
+                  <div class="d-flex justify-content-center">
+                      <button class="btn btn-primary" type="submit">Создать команду</button>
+                  </div>
+            </div>
+        </div>
+    </div>
 </body>
 {% endblock %}
 
 
 {% block js-scripts %}
+<script>
+    document.querySelectorAll('.scrum-card').forEach(item => {
+    const title = item.querySelector('h5').innerText;
+    const description = item.querySelector('p').innerText;
+    item.dataset.bsToggle = "modal";
+    item.dataset.bsTarget = "#TaskDetail";
+    item.addEventListener('click', () => fillTaskDetail(title, description));
+});
+function fillTaskDetail(title, description){
+    document.getElementById('task-detail-name-tb').value = title;
+    document.getElementById('task-detail-description-tb').value = description;
+};
+
+</script>
+
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 {% endblock %}

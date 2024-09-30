@@ -136,7 +136,7 @@ def forgot_password(request):
 def get_teams(request):
     user = request.user
     teams = TeamEmployee.objects.filter(employee=user).values_list("team", flat=True)
-    teams = Team.objects.filter(id__in=teams)
+    teams = Team.objects.filter(team_id__in=teams)
     return render(request, "teams.html", {"teams": teams})
 
 

@@ -18,8 +18,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
+from gamification import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("team_detail_test/", views.team_detail_test, name='team_detail_test'),
     path("", include("gamification.urls")),
 ]

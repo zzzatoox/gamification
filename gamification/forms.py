@@ -2,7 +2,7 @@ from django import forms
 from .models import Task
 
 
-class CreateTaskForm(forms.Model):
+class CreateTaskForm(forms.ModelForm):
     model = Task
     fields = ["title", "description", "xp_reward", "deadline"]
     labels = {

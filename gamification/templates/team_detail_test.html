@@ -12,55 +12,67 @@
 
   .scrum-column {
     flex: 1;
-    margin: 0 10px;
+    margin: 0 10px 10px;
     background-color: #f8f9fa;
     border-radius: 5px;
     padding: 15px;
   }
 
-  .scrum-card {
+  .scrum-card-body {
     background-color: #fff;
     border: 1px solid #dee2e6;
     border-radius: 5px;
     padding: 15px;
     margin-bottom: 15px;
+  }
+  .scrum-card {
     cursor: pointer;
   }
+
 </style>
 {% endblock %}
 
 {% block body %}
 
 <body>
-  <section style="background-color: #eee;">
+  <section>
     <div class="container py-5">
       <div class="row">
         <div class="col-lg-4">
           <!-- Блок с профилем команды -->
           <div class="card mb-4">
             <div class="card-body text-center">
-              <img src="{{ team_photo_url }}" alt="{{ team.title }} photo" class="img-fluid"
-                style="width: 150px; height: 165px;">
+              <span class="border">
+                <img src="{{ team_photo_url }}" alt="{{ team.title }} photo" class="img-fluid"
+                  style="width: 150px; height: 165px;">
+              </span>
               <h5 class="my-3">{{ team.title }}</h5>
               {% if user == team.owner %}
-              <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#EditTeamProfile">
-                Редактировать </button>
+              <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#EditTeamProfile">Редактировать
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                  <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
+                </svg>  
+              </button>
+              <a href="{% url 'invite' %}">
+                <button class="btn btn-outline-dark"> 
+                      Пригласить
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-person-add" viewBox="0 0 16 16">
+                        <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+                        <path d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"/>
+                      </svg></button>
+              </a>
               {% endif %}
               <div class="mb-2">
-                <p class="mt-4 mb-1" style="font-size: .77rem;">{{ team.xp }}</p>
-                <div class="progress rounded mb-2" style="height: 5px;">
-                  <div class="progress-bar" role="progressbar" style="width: 66%" aria-valuenow="66" aria-valuemin="0"
-                    aria-valuemax="100"></div>
-                </div>
+                <p class="mt-4 mb-1" style="font-size: 16 pt;">{{ team.xp }} xp</p>
               </div>
             </div>
-            <div class="card  mb-4">
+            <div class="card" style="border:none;">
               <div class="card-body text-center">
                 <div class="row">
-                  <div class="col-sm-4">
+                  <div class="col-5">
                     <p class="mb-0">Дата создания</p>
                   </div>
-                  <div class="col-sm-7">
+                  <div class="col-7">
                     <p class="text-muted mb-0">{{ team.created_at }}</p>
                   </div>
                 </div>
@@ -73,34 +85,25 @@
           <div class="row">
             <div class="col">
               <div class="card mb-4 mb-md-0">
-                <div class="row">
-                  <div class="col-2"></div>
-                  <div class="col-4">
-                    <h3 class=" ms-4 mt-2">Участники</h3>
-                  </div>
-                  {% if user == team.owner %}
-                  <div class="col-4">
-                    <button class="btn btn-outline-dark mt-2" data-bs-toggle="modal"
-                      data-bs-target="#InviteUser">Пригласить</button>
-                  </div>
-                  {% endif %}
+                <div class="row text-center">
+                    <h3 class="mt-2">Участники</h3>
                 </div>
-                <div class="card-body" style="overflow-y: auto; height:382px;">
+                <div class="card-body" style="overflow-y: auto; {% if user == team.owner %} height:354px; {% else %} height:299px; {% endif %}">
                   <!-- Карточка участника -->
                   {% for member, photo_url in members %}
-                  <div class="card ms-1 me-1 mb-1">
+                  <div class="card m-2">
                     <div class="row align-items-center">
-                      <div class="col-2 m-1">
+                      <div class="col-2 ms-1 me-1">
                         <img src="{{ photo_url }}" class="card-img-top rounded-circle mx-auto d-block m-1"
                           style="width: 50px; height: 50px;">
                       </div>
                       <div class="col-6" style="font-size: 14.5pt;">
-                        <p>{{ member.employee.last_name }} {{ member.employee.first_name }}
-                          {{ member.employee.patronymic }}</p>
+                        <p class="mt-3">{{member.employee.last_name}} {{member.employee.first_name}}
+                          {{member.employee.patronymic}}</p>
                       </div>
                       <div class="col-2" style="font-size: 14pt;">
                         {% if member.employee == team.owner %}
-                        Создатель
+                         Глава
                         {% else %}
                         Участник
                         {% endif %}
@@ -122,73 +125,88 @@
         <div class="container">
           <div class="card">
             <div class="row d-flex justify-content-center align-items-center">
-              <div class="col-2"></div>
-              <div class="col-4 text-center m-2">
+              <div class="col-3"></div>
+              <div class="col-5 text-center m-2">
                 <h1>Задачи команды</h1>
               </div>
               {% if user == team.owner %}
-              <div class="col-2 text-end">
-                <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#CreateTaskModal">Создать
-                  задачу</button>
+              <div class="col-3 d-flex justify-content-end">
+                <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#CreateTaskModal">Добавить  
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-clipboard-plus ms-1" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7"/>
+                    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
+                    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/>
+                  </svg>
+                </button>
               </div>
               {% endif %}
             </div>
             <div class="scrum-board">
-              <div class="scrum-column">
+              <div class="scrum-column scrum-column-todo">
                 <h2 class="text-center">В ожидании</h2>
                 {% for task in waiting_tasks %}
-                <div class="scrum-card">
-                  <div class="row">
-                    <div class="col-10">
-                      <h5>{{ task.title }}</h5>
+                <div class="scrum-card-body">
+                  {% if user == team.owner %}
+                  <div class="col d-flex justify-content-end">
+                    <button class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                  </div>
+                  {% endif %}
+                  <div class="scrum-card">
+                    <div class="row">
+                      <div class="col-10">
+                        <h5>{{ task.title }}</h5>
+                      </div>
+                      <div class="row"></div>
+                      <p>{{ task.description }}</p>
                     </div>
-                    {% if user == team.owner %}
-                    <div class="col-2">
-                      <button class="btn btn-sm btn-outline-dark">X</button>
-                    </div>
-                    {% endif %}
-                    <div class="row"></div>
-                    <p>{{ task.description }}</p>
                   </div>
                 </div>
                 {% endfor %}
               </div>
 
-              <div class="scrum-column">
+              <div class="scrum-column scrum-column-inprogress">
                 <h2 class="text-center">В процессе</h2>
                 {% for task in in_progress_tasks %}
-                <div class="scrum-card">
-                  <div class="row">
-                    <div class="col-10">
-                      <h5>{{ task.title }}</h5>
+                <div class="scrum-card-body">
+                  {% if user == team.owner %}
+                  <div class="col d-flex justify-content-end">
+                    <button class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                  </div>
+                  {% endif %}
+                  <div class="scrum-card">
+                    <div class="row">
+                      <div class="col-10">
+                        <h5>{{ task.title }}</h5>
+                      </div>
+                      <div class="row"></div>
+                      <p>{{ task.description }}</p>
                     </div>
-                    {% if user == team.owner %}
-                    <div class="col-2">
-                      <button class="btn btn-sm btn-outline-dark">X</button>
-                    </div>
-                    {% endif %}
-                    <div class="row"></div>
-                    <p>{{ task.description }}</p>
                   </div>
                 </div>
                 {% endfor %}
               </div>
 
-              <div class="scrum-column">
+              <div class="scrum-column scrum-column-done">
                 <h2 class="text-center">Выполнено</h2>
                 {% for task in completed_tasks %}
-                <div class="scrum-card">
-                  <div class="row">
-                    <div class="col-10">
-                      <h5>{{ task.title }}</h5>
+                <div class="scrum-card-body">
+                  {% if user == team.owner %}
+                  <div class="col d-flex justify-content-end">
+                    <button class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                  </div>
+                  {% endif %}
+                  <div class="scrum-card">
+                    <div class="row">
+                      <div class="col-10">
+                        <h5>{{ task.title }}</h5>
+                        <!-- Проверку в зависимости от статуса -->
+                        <p style="font-style: italic;">На проверке</p>
+                        <p style="font-style: italic;">Выполнено</p>
+                        <!-- ^^^^ -->
+                      </div>
+                      <div class="row"></div>
+                      <p>{{ task.description }}</p>
                     </div>
-                    {% if user == team.owner %}
-                    <div class="col-2">
-                      <button class="btn btn-sm btn-outline-dark">X</button>
-                    </div>
-                    {% endif %}
-                    <div class="row"></div>
-                    <p>{{ task.description }}</p>
                   </div>
                 </div>
                 {% endfor %}
@@ -220,26 +238,13 @@
               <label for="message-text" class="col-form-label">Описание</label>
               <textarea class="form-control" id="message-text" name="description"></textarea>
             </div>
-            <div class="input-group mb-3">
-              <input type="text" class="form-control" id="task-executor-tb" placeholder="Выберите исполнителя">
-              <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Участники</button>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <!-- Можно как-то придумать хранение id-шников в data-value -->
-                <!-- Загружать сюда данные только участников команды -->
-                {% for member, photo in members %}
-                <li><a class="dropdown-item" href="#" data-value="{{ member.employee.id }}">
-                    {{ member.employee.last_name}} {{ member.employee.first_name }} {{ member.employee.patronymic }}</a>
-                </li>
-                {% endfor %}
-              </ul>
-            </div>
+           
             <input type="hidden" id="executor_id" name="executor">
             <input type="hidden" name="team_id" value="{{ team.team_id }}">
-            <div class="container d-flex justify-content-end"></div>
-            <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
-            <button type="submit" class="btn btn-primary m-1">Создать</button>
-        </div>
+            <div class="container d-flex justify-content-end">
+              <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
+              <button type="submit" class="btn btn-primary m-1">Создать</button>
+            </div>
         </form>
       </div>
     </div>
@@ -277,35 +282,8 @@
     </div>
   </div>
 
-
-  <!-- Modal-window InviteUser -->
-  <div class="modal fade" id="InviteUser" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Приглашение в команду</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form>
-            <div class="input-group mb-3">
-              <input type="text" class="form-control" id="invite-user-tb" placeholder="Кого вы хотите пригласить?">
-              <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                aria-expanded="false">Пользователи</button>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="#" data-value="1">Шляпкин Антон Александрович</a></li>
-                <li><a class="dropdown-item" href="#" data-value="2">Наталья Морская Пехота</a></li>
-                <li><a class="dropdown-item" href="#" data-value="3">Жмышенко Валерий </a></li>
-              </ul>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal-window TaskDetail -->
-  <div class="modal fade" id="TaskDetail" tabindex="-1" aria-hidden="true">
+  <!-- Modal-window TaskDetailTodo -->
+  <div class="modal fade" id="TaskDetailTodo" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -315,27 +293,115 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Название</label>
-            <input type="text" class="form-control" id="task-detail-name-tb">
+            <input type="text" class="form-control" readonly id="task-detail-todo-name-tb">
           </div>
           <div class="mb-3">
             <label class="form-label">Описание</label>
-            <textarea class="form-control" id="task-detail-description-tb" rows="3"></textarea>
+            <textarea class="form-control" readonly id="task-detail-todo-description-tb" rows="3"></textarea>
+          </div>
+          <div class="container d-flex justify-content-end">
+            <!-- Если овнер -->
+             <button class="btn btn-primary m-1" data-bs-target="#AddExecutor" data-bs-toggle="modal">Назначить исполнителя</button>
+             <!--  -->
+            <button type="submit" class="btn btn-success m-1">Взять задачу</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal-window TaskDetailInProgress -->
+  <div class="modal fade" id="TaskDetailInProgress" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Подробнее о задаче</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Название</label>
+            <input type="text" class="form-control" readonly id="task-detail-in-progress-name-tb">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Описание</label>
+            <textarea class="form-control" readonly id="task-detail-in-progress-description-tb" rows="3"></textarea>
+          </div>
+          <div class="container d-flex justify-content-end">
+            <button type="submit" class="btn btn-success m-1">Отправить на проверку</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal-window TaskDetailDone -->
+  <div class="modal fade" id="TaskDetailDone" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Подробнее о задаче</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Название</label>
+            <input type="text" class="form-control" readonly id="task-detail-done-name-tb">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Описание</label>
+            <textarea class="form-control" readonly id="task-detail-done-description-tb" rows="3"></textarea>
+            <!-- Если сообщение на проверке, и если его смотрит овнер, то отобразить кнопку "принять" -->
+            <div class="container d-flex justify-content-end">
+              <button class="btn btn-sm btn-success">Принять</button>
+            </div>
+            <!--  -->
           </div>
         </div>
       </div>
     </div>
   </div>
 
-
+  <!-- ModalWindow AddExecutor -->
+  <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="AddExecutor" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Назначение участника на решение задачи</h5>
+        </div>
+        <div class="modal-body">
+          <input type="text" class="form-control mb-4" id="add-executor-tb" placeholder="Кого вы хотите назначить?">
+          <div class="card-body" style="overflow-y: auto; overflow-x: hidden; max-height: 700px;">
+            <!-- Карточка пользователя -->
+            {% for member, photo_url in members %}
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="flexRadioDefault" id="member_{{ member.employee.id }}" checked>
+              <div class="card executor-card mb-1" data-member-id="{{ member.employee.id }}" data-name="{{ member.employee.last_name }} {{ member.employee.first_name }} {{ member.employee.patronymic }}">
+                <div class="card-body">
+                  <a class="card-link" style="text-decoration: none; color: inherit; cursor:pointer" data-value="{{ member.employee.id }}">
+                    <div class="row align-items-center">
+                      <div class="col-2 m-1">
+                        <img src="{{ photo_url }}" class="card-img-top rounded-circle mx-auto d-block m-1" style="width: 50px; height: 50px;">
+                      </div>
+                      <div class="col-8" style="font-size: 14.5pt;">
+                        <p><span style="font-style: italic;">ФИО: </span>{{ member.employee.last_name }} {{ member.employee.first_name }} {{ member.employee.patronymic }}</p>
+                        <p><span style="font-style: italic;">Логин: </span>{{ member.employee.username }}</p>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="d-flex justify-content-end">
+            <button class="btn btn-danger m-2" id="cancel-btn" href="#">Отменить</button>
+            <button class="btn btn-success m-2" type="submit">Назначить</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
-    // document.querySelectorAll('#CreateTaskModal .dropdown-item').forEach(item => {
-    //   item.addEventListener('click', event => {
-    //     event.preventDefault();
-    //     document.getElementById('task-executor-tb').value = event.target.innerText;
-    //   });
-    // });
-
     // create task script
     document.addEventListener('DOMContentLoaded', function () {
       const form = document.getElementById('createTaskForm');
@@ -424,16 +490,80 @@
     document.querySelectorAll('.scrum-card').forEach(item => {
       const title = item.querySelector('h5').innerText;
       const description = item.querySelector('p').innerText;
+      const column = item.closest('.scrum-column');
+      const columnClass = column ? column.className : 'unknown';
       item.dataset.bsToggle = "modal";
-      item.dataset.bsTarget = "#TaskDetail";
-      item.addEventListener('click', () => fillTaskDetail(title, description));
-    });
-    function fillTaskDetail(title, description) {
-      document.getElementById('task-detail-name-tb').value = title;
-      document.getElementById('task-detail-description-tb').value = description;
-    };
 
-    document.getElementsByClassName()
+      switch(columnClass) {
+        case 'scrum-column scrum-column-todo':
+          item.dataset.bsTarget = "#TaskDetailTodo";
+          break;
+        case 'scrum-column scrum-column-inprogress':
+          item.dataset.bsTarget = "#TaskDetailInProgress";
+          break;
+        case 'scrum-column scrum-column-done':
+          item.dataset.bsTarget = "#TaskDetailDone";
+          break;
+      }
+
+      // Добавляем обработчик события для кнопки удаления
+      const deleteButton = item.querySelector('.delete-card');
+      if (deleteButton) {
+        deleteButton.addEventListener('click', (event) => {
+          event.preventDefault();
+        });
+      }
+    });
+
+function fillTaskDetail(title, description, column, item) {
+    switch(column) {
+        case 'scrum-column scrum-column-todo':
+            document.getElementById('task-detail-todo-name-tb').value = title;
+            document.getElementById('task-detail-todo-description-tb').value = description;
+            break;
+        case 'scrum-column scrum-column-inprogress':
+            document.getElementById('task-detail-in-progress-name-tb').value = title;
+            document.getElementById('task-detail-in-progress-description-tb').value = description;
+            break;
+        case 'scrum-column scrum-column-done':
+            document.getElementById('task-detail-done-name-tb').value = title;
+            document.getElementById('task-detail-done-description-tb').value = description;
+            break;
+    }
+}
+
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', function() {
+      const memberId = this.getAttribute('data-member-id');
+      const radioButton = document.getElementById(`member_${memberId}`);
+      if (radioButton) {
+        radioButton.checked = true;
+      }
+    });
+  });
+  document.getElementById('add-executor-tb').addEventListener('input', function() {
+  const filterValue = this.value.toLowerCase();
+  const formChecks = document.querySelectorAll('.form-check');
+
+  formChecks.forEach(formCheck => {
+    const card = formCheck.querySelector('.executor-card');
+    const name = card.getAttribute('data-name').toLowerCase();
+    if (name.includes(filterValue)) {
+      formCheck.style.display = 'block';
+    } else {
+      formCheck.style.display = 'none';
+    }
+  });
+});
+  document.getElementById('cancel-btn').addEventListener('click', function() {
+    location.reload();
+  });
+  document.querySelectorAll('.close-button').forEach(button => {
+  button.addEventListener('click', event => {
+    event.preventDefault(); 
+    // Логика для удаления задачи
+  });
+});
   </script>
 
 

@@ -24,12 +24,18 @@
                         <li><a class="dropdown-item" href="{% url 'ratings_teams' %}">Команды</a></li>
                         <li><a class="dropdown-item" href="{% url 'ratings_users' %}">Участники</a></li>
                     </ul>
+                    
                 </li>
                 {% if user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link active" href="{% url 'teams' %}">Команды</a>
                 </li>
                 {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'shop' %}">
+                        Магазин
+                    </a>
+                </li>
             </ul>
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}

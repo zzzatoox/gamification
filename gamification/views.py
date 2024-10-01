@@ -10,6 +10,8 @@ from django.conf import settings
 
 from .forms import CreateTaskForm
 
+from django.http import JsonResponse
+
 from django.db import transaction
 from .models import (
     User,
@@ -137,10 +139,27 @@ def get_teams(request):
     user = request.user
     owned_teams = Team.objects.filter(owner=user)
     member_teams = TeamEmployee.objects.filter(employee=user).exclude(team__owner=user)
+
+    # получаем фотографии
+    owned_teams_with_photos = [
+        {"team": team, "photo_url": get_team_photo_url(team)} for team in owned_teams
+    ]
+
+    member_teams_with_photos = [
+        {
+            "team": team_employee.team,
+            "photo_url": get_team_photo_url(team_employee.team),
+        }
+        for team_employee in member_teams
+    ]
+
     return render(
         request,
         "teams.html",
-        {"owned_teams": owned_teams, "member_teams": member_teams},
+        {
+            "owned_teams": owned_teams_with_photos,
+            "member_teams": member_teams_with_photos,
+        },
     )
 
 
@@ -157,6 +176,18 @@ def create_team(request):
     return render(request, "create_team.html")
 
 
+@login_required
+def edit_team(request):
+    if request.method == "POST":
+        team = get_object_or_404(Team, team_id=request.POST.get("team_id"))
+        team.title = request.POST.get("title")
+        if "photo" in request.FILES:
+            team.photo = request.FILES["photo"]
+        team.save()
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False, "message": "Invalid request method"})
+
+
 def ratings_teams(request):
     team_list = Team.objects.all().order_by("-xp")
 
@@ -170,10 +201,20 @@ def ratings_teams(request):
 
     other_teams = team_list[3:]
 
+    # получаем фотографии
+    top_teams_with_photos = [
+        {"team": team, "photo_url": get_team_photo_url(team)}
+        for team in top_teams_ordered
+    ]
+
+    other_teams_with_photos = [
+        {"team": team, "photo_url": get_team_photo_url(team)} for team in other_teams
+    ]
+
     return render(
         request,
         "ratings_teams.html",
-        {"top_teams": top_teams_ordered, "other_teams": other_teams},
+        {"top_teams": top_teams_with_photos, "other_teams": other_teams_with_photos},
     )
 
 
@@ -190,47 +231,76 @@ def ratings_users(request):
 
     other_users = user_list[3:]
 
+    # получаем фотографии
+    top_teams_with_photos = [
+        {"user": user, "photo_url": get_user_photo_url(user.user)}
+        for user in top_users_ordered
+    ]
+
+    other_teams_with_photos = [
+        {"user": user, "photo_url": get_user_photo_url(user.user)}
+        for user in other_users
+    ]
+
     return render(
         request,
         "ratings_users.html",
-        {"top_users": top_users_ordered, "other_users": other_users},
+        {"top_users": top_teams_with_photos, "other_users": other_teams_with_photos},
     )
-
-
-@login_required
-def team_detail(request, team_id):
-    # Проверять, является ли пользователь участником команды и выдавать страницу в зависимости от прав
-    user = request.user
-    is_team_owner = Team.objects.filter(owner=user, id=team_id).exists()
-    is_team_member = TeamEmployee.objects.filter(
-        employee=user, team_id=team_id
-    ).exists()
-
-    if is_team_owner:
-        team = Team.objects.get(id=team_id)
-        return render(
-            request, "team_detail.html", {"team": team, "is_team_owner": True}
-        )
-    elif is_team_member:
-        team = Team.objects.get(id=team_id)
-        return render(
-            request, "team_detail.html", {"team": team, "is_team_owner": False}
-        )
-    else:
-        return redirect("home")
 
 
 @login_required(login_url="authorization")
 def team_detail_test(request, team_id):
     team = Team.objects.get(team_id=team_id)
-    return render(request, "team_detail_test.html", {"team": team})
+    members = team.members.all()
+    member_photos = [get_user_photo_url(member.employee) for member in members]
+    members_with_photos = list(zip(members, member_photos))
+
+    # получение задач
+    tasks = Task.objects.filter(team=team)
+
+    waiting_tasks = []
+    in_progress_tasks = []
+    completed_tasks = []
+
+    for task in tasks:
+        task_assignments = TaskEmployee.objects.filter(task=task)
+        if not task_assignments.exists():
+            waiting_tasks.append(task)
+        else:
+            latest_assignment = task_assignments.latest("took_at")
+            if latest_assignment.completed_at:
+                if (timezone.now() - latest_assignment.completed_at).days <= 7:
+                    completed_tasks.append(task)
+            else:
+                in_progress_tasks.append(task)
+
+    return render(
+        request,
+        "team_detail_test.html",
+        {
+            "team": team,
+            "team_photo_url": get_team_photo_url(team),
+            "members": members_with_photos,
+            "waiting_tasks": waiting_tasks,
+            "in_progress_tasks": in_progress_tasks,
+            "completed_tasks": completed_tasks,
+        },
+    )
 
 
 def get_user_photo_url(user):
     if user.photo:
         return user.photo.url
     else:
-        return settings.STATIC_URL + "images/placeholder.jpg"
+        return settings.STATIC_URL + "images/placeholder_profile.jpg"
+
+
+def get_team_photo_url(team):
+    if team.photo:
+        return team.photo.url
+    else:
+        return settings.STATIC_URL + "images/placeholder_team.jpg"
 
 
 def profile(request, user_id):
@@ -276,14 +346,36 @@ def profile(request, user_id):
 @login_required
 def create_task(request):
     if request.method == "POST":
-        form = CreateTaskForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("task_list")
-    else:
-        form = CreateTaskForm()
+        title = request.POST.get("title")
+        description = request.POST.get("description")
+        executor_id = request.POST.get("executor")
+        team_id = request.POST.get("team_id")
 
-    return render(request, "create_task.html", {"form": form})
+        print(f"title: {title}")
+        print(f"description: {description}")
+        print(f"team_id: {team_id}")
+        print(f"executor_id: {executor_id}")
+
+        team = Team.objects.get(team_id=team_id)
+
+        task = Task.objects.create(
+            title=title,
+            description=description,
+            team=team,
+            xp_reward=10,  # TODO: подставить реальное значение
+            coins_reward=5,  # TODO: подставить реальное значение
+        )
+
+        if executor_id:
+            executor = User.objects.get(id=executor_id)
+            TaskEmployee.objects.create(
+                task=task,
+                employee=executor,
+            )
+
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False, "error": "Invalid request method"})
 
 
 @login_required

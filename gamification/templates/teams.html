@@ -13,7 +13,7 @@
     color: black;
   }
 
-  .card-link{
+  .card-link {
     text-decoration: none;
   }
 </style>
@@ -52,22 +52,22 @@
         {% for team in owned_teams %}
         <div class="row">
           <div class="col">
-              <div class="card mb-4 mb-md-0" style="border:none;">
-                  <div class="card-body">
-                      <a href="{% url 'team_detail_test' team.team_id %}" class="card-link">
-                      <div class="card m-1 mb-2">
-                          <div class="row align-items-center" style="font-size: 14pt;">
-                    <div class="col-2 m-1 ">
-                      <img src="https://via.placeholder.com/100" class="card-img-top mx-auto d-block m-1"
-                        style="width: 100px; height: 100px;">
+            <div class="card mb-4 mb-md-0" style="border:none;">
+              <div class="card-body">
+                <a href="{% url 'team_detail' team.team.team_id %}" class="card-link">
+                  <div class="card m-1 mb-2">
+                    <div class="row align-items-center" style="font-size: 14pt;">
+                      <div class="col-2 m-1 ">
+                        <img src="{{ team.photo_url }}" class="card-img-top mx-auto d-block m-1"
+                          style="width: 100px; height: 100px;">
+                      </div>
+                      <div class="col-3" style="font-size: 15pt;">
+                        <p>{{ team.team.title }}</p>
+                      </div>
+                      <div class="col-3">Участников {{ team.team.members.count }}</div>
+                      <div class="col-3">{{ team.team.xp }} xp</div>
                     </div>
-                    <div class="col-3" style="font-size: 15pt;">
-                      <p>{{ team.title }}</p>
-                    </div>
-                    <div class="col-3">Участников {{ team.members.count }}</div>
-                    <div class="col-3">{{ team.xp }} xp</div>
                   </div>
-                </div>
                 </a>
               </div>
             </div>
@@ -79,23 +79,23 @@
         {% for team in member_teams %}
         <div class="row">
           <div class="col">
-              <div class="card mb-4 mb-md-0" style="border:none;">
-                  <div class="card-body">
-                      <a href="{% url 'team_detail_test' team.team.team_id %}" class="card-link">
-                      <div class="card m-1 mb-2">
-                  <div class="row align-items-center" style="font-size: 14pt;">
-                    <div class="col-2 m-1 ">
-                      <img src="https://via.placeholder.com/100" class="card-img-top mx-auto d-block m-1"
-                        style="width: 100px; height: 100px;">
+            <div class="card mb-4 mb-md-0" style="border:none;">
+              <div class="card-body">
+                <a href="{% url 'team_detail' team.team.team_id %}" class="card-link">
+                  <div class="card m-1 mb-2">
+                    <div class="row align-items-center" style="font-size: 14pt;">
+                      <div class="col-2 m-1 ">
+                        <img src="{{ team.photo_url }}" class="card-img-top mx-auto d-block m-1"
+                          style="width: 100px; height: 100px;">
+                      </div>
+                      <div class="col-3" style="font-size: 15pt;">
+                        <p>{{ team.team.title }}</p>
+                      </div>
+                      <div class="col-3">Участников {{ team.team.members.count }}</div>
+                      <div class="col-3">{{ team.team.xp }} xp</div>
                     </div>
-                    <div class="col-3" style="font-size: 15pt;">
-                      <p>{{ team.team.title }}</p>
-                    </div>
-                    <div class="col-3">Участников {{ team.team.members.count }}</div>
-                    <div class="col-3">{{ team.team.xp }} xp</div>
                   </div>
-                </div>
-               </a>
+                </a>
               </div>
             </div>
           </div>

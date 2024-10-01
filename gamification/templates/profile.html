@@ -27,21 +27,25 @@
               </div>
             </div>
           </div>
-          {% for achievement_obj in achievements %}
           <div class="card mb-4 mb-lg-0">
             <div class="card-body p-0">
               <div class="col-md-4 mb-4">
-                <div class="card" data-bs-toggle="modal" data-bs-target="#modalId">
-                  <img src="https://via.placeholder.com/50" class="card-img-top rounded-circle mx-auto d-block mt-3"
-                    alt="Достижение 1" style="width: 50px; height: 50px;">
+                {% for achievement_obj in achievements %}
+                <div class="card" data-bs-toggle="modal" data-bs-target="#modalId"
+                  data-title="{{ achievement_obj.achievement.title }}"
+                  data-description="{{ achievement_obj.achievement.description }}"
+                  data-photo="{{ achievement_obj.achievement.photo.url }}">
+                  <img src="{{ achievement_obj.achievement.photo.url }}"
+                    class="card-img-top rounded-circle mx-auto d-block mt-3" alt="Достижение 1"
+                    style="width: 50px; height: 50px;">
                   <div class="card-body text-center">
-                    <h5 class="card-title">{{achievement_obj.achievement.title}}</h5>
+                    <h5 class="card-title">{{ achievement_obj.achievement.title }}</h5>
                   </div>
                 </div>
+                {% endfor %}
               </div>
             </div>
           </div>
-          {% endfor %}
         </div>
         <div class="col-lg-8">
           <div class="card mb-4">
@@ -103,27 +107,38 @@
     <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-sm" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="modalTitleId">Выполнить 5 задач за день</h5>
+          <h5 class="modal-title" id="modalTitleId"></h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">Ого! Вы такой трудолюбивый, что выполнили 5 задач за один рабочий день! Поздравляем, так
-          держать!
-          <div class="d-flex "></div>
-          <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" alt="avatar"
-            class="img-fluid" style="width: 150px; height: 165px;">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary">ОК</button>
+        <div class="modal-body">
+          <p></p>
+          <div class="d-flex justify-content-center">
+            <img src="" alt="avatar" class="img-fluid" style="width: 150px; height: 165px;">
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    const myModal = new bootstrap.Modal(
-      document.getElementById("modalId"),
-      options,
-    );
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var modal = document.getElementById('modalId');
+      modal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var title = button.getAttribute('data-title');
+        var description = button.getAttribute('data-description');
+        var photo = button.getAttribute('data-photo');
+
+        var modalTitle = modal.querySelector('.modal-title');
+        var modalBody = modal.querySelector('.modal-body');
+        var modalImage = modal.querySelector('.modal-body img');
+
+        modalTitle.textContent = title;
+        modalBody.querySelector('p').textContent = description;
+        modalImage.src = photo;
+      });
+    });
   </script>
 
 

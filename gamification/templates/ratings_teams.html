@@ -76,8 +76,8 @@
                 {% elif forloop.counter == 3 %}
                 <div class="position">3</div>
                 {% endif %}
-                <img src="https://via.placeholder.com/80" alt="{{ team.title }}">
-                <div class="team-name">{{ team.title }}</div>
+                <img src="{{ team.photo_url }}" alt="{{ team.team.title }}">
+                <div class="team-name">{{ team.team.title }}</div>
             </div>
             {% endfor %}
         </div>
@@ -87,6 +87,7 @@
             <thead>
                 <tr>
                     <th>#</th>
+                    <th>Фото</th>
                     <th>Команда</th>
                     <th>Очки</th>
                 </tr>
@@ -95,8 +96,10 @@
                 {% for team in other_teams %}
                 <tr>
                     <td>{{ forloop.counter|add:3 }}</td>
-                    <td>{{ team.title }}</td>
-                    <td>{{ team.xp }}</td>
+                    <td><img class="rounded-circle" style="width: 50px; height: 50px;" src="{{ team.photo_url }}"
+                            alt="{{ team.team.title }}"></td>
+                    <td>{{ team.team.title }}</td>
+                    <td>{{ team.team.xp }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

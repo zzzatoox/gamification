@@ -39,11 +39,13 @@
           <!-- Блок с профилем команды -->
           <div class="card mb-4">
             <div class="card-body text-center">
-              <img src="https://via.placeholder.com/150" alt="avatar" class="img-fluid"
+              <img src="{{ team_photo_url }}" alt="{{ team.title }} photo" class="img-fluid"
                 style="width: 150px; height: 165px;">
               <h5 class="my-3">{{ team.title }}</h5>
+              {% if user == team.owner %}
               <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#EditTeamProfile">
                 Редактировать </button>
+              {% endif %}
               <div class="mb-2">
                 <p class="mt-4 mb-1" style="font-size: .77rem;">{{ team.xp }}</p>
                 <div class="progress rounded mb-2" style="height: 5px;">
@@ -76,19 +78,21 @@
                   <div class="col-4">
                     <h3 class=" ms-4 mt-2">Участники</h3>
                   </div>
+                  {% if user == team.owner %}
                   <div class="col-4">
                     <button class="btn btn-outline-dark mt-2" data-bs-toggle="modal"
                       data-bs-target="#InviteUser">Пригласить</button>
                   </div>
+                  {% endif %}
                 </div>
                 <div class="card-body" style="overflow-y: auto; height:382px;">
                   <!-- Карточка участника -->
-                  {% for member in team.members.all %}
+                  {% for member, photo_url in members %}
                   <div class="card ms-1 me-1 mb-1">
                     <div class="row align-items-center">
                       <div class="col-2 m-1">
-                        <img src="https://via.placeholder.com/50"
-                          class="card-img-top rounded-circle mx-auto d-block m-1" style="width: 50px; height: 50px;">
+                        <img src="{{ photo_url }}" class="card-img-top rounded-circle mx-auto d-block m-1"
+                          style="width: 50px; height: 50px;">
                       </div>
                       <div class="col-6" style="font-size: 14.5pt;">
                         <p>{{ member.employee.last_name }} {{ member.employee.first_name }}
@@ -101,9 +105,11 @@
                         Участник
                         {% endif %}
                       </div>
+                      {% if user == team.owner and member.employee != team.owner %}
                       <div class="col-1">
                         <button class="btn btn-sm btn-outline-dark">Х</button>
                       </div>
+                      {% endif %}
                     </div>
                   </div>
                   {% endfor %}
@@ -120,70 +126,72 @@
               <div class="col-4 text-center m-2">
                 <h1>Задачи команды</h1>
               </div>
+              {% if user == team.owner %}
               <div class="col-2 text-end">
                 <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#CreateTaskModal">Создать
                   задачу</button>
               </div>
+              {% endif %}
             </div>
             <div class="scrum-board">
               <div class="scrum-column">
                 <h2 class="text-center">В ожидании</h2>
+                {% for task in waiting_tasks %}
                 <div class="scrum-card">
                   <div class="row">
                     <div class="col-10">
-                      <h5>Задача 1</h5>
+                      <h5>{{ task.title }}</h5>
                     </div>
+                    {% if user == team.owner %}
                     <div class="col-2">
                       <button class="btn btn-sm btn-outline-dark">X</button>
                     </div>
+                    {% endif %}
                     <div class="row"></div>
-                    <p>Описание задачи 1...</p>
+                    <p>{{ task.description }}</p>
                   </div>
                 </div>
-                <div class="scrum-card">
-                  <div class="row">
-                    <div class="col-10">
-                      <h5>Задача 2</h5>
-                    </div>
-                    <div class="col-2">
-                      <button class="btn btn-sm btn-outline-dark">X</button>
-                    </div>
-                    <div class="row"></div>
-                    <p>Описание задачи 2...</p>
-                  </div>
-                </div>
+                {% endfor %}
               </div>
 
               <div class="scrum-column">
                 <h2 class="text-center">В процессе</h2>
+                {% for task in in_progress_tasks %}
                 <div class="scrum-card">
                   <div class="row">
                     <div class="col-10">
-                      <h5>Задача 3</h5>
+                      <h5>{{ task.title }}</h5>
                     </div>
+                    {% if user == team.owner %}
                     <div class="col-2">
                       <button class="btn btn-sm btn-outline-dark">X</button>
                     </div>
+                    {% endif %}
                     <div class="row"></div>
-                    <p>Описание задачи 3...</p>
+                    <p>{{ task.description }}</p>
                   </div>
                 </div>
+                {% endfor %}
               </div>
 
               <div class="scrum-column">
                 <h2 class="text-center">Выполнено</h2>
+                {% for task in completed_tasks %}
                 <div class="scrum-card">
                   <div class="row">
                     <div class="col-10">
-                      <h5>Задача 4</h5>
+                      <h5>{{ task.title }}</h5>
                     </div>
+                    {% if user == team.owner %}
                     <div class="col-2">
                       <button class="btn btn-sm btn-outline-dark">X</button>
                     </div>
+                    {% endif %}
                     <div class="row"></div>
-                    <p>Описание задачи 4...</p>
+                    <p>{{ task.description }}</p>
                   </div>
                 </div>
+                {% endfor %}
               </div>
             </div>
           </div>
@@ -202,14 +210,15 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form>
+          <form id="createTaskForm" method="post" action="{% url 'create_task' %}">
+            {% csrf_token %}
             <div class="mb-3">
               <label for="recipient-name" class="col-form-label">Название:</label>
-              <input type="text" class="form-control" id="recipient-name">
+              <input type="text" class="form-control" id="recipient-name" name="title">
             </div>
             <div class="mb-3">
               <label for="message-text" class="col-form-label">Описание</label>
-              <textarea class="form-control" id="message-text"></textarea>
+              <textarea class="form-control" id="message-text" name="description"></textarea>
             </div>
             <div class="input-group mb-3">
               <input type="text" class="form-control" id="task-executor-tb" placeholder="Выберите исполнителя">
@@ -218,11 +227,15 @@
               <ul class="dropdown-menu dropdown-menu-end">
                 <!-- Можно как-то придумать хранение id-шников в data-value -->
                 <!-- Загружать сюда данные только участников команды -->
-                <li><a class="dropdown-item" href="#" data-value="1">Шляпкин Антон Александрович</a></li>
-                <li><a class="dropdown-item" href="#" data-value="2">Наталья Морская Пехота</a></li>
-                <li><a class="dropdown-item" href="#" data-value="3">Жмышенко Валерий Альбертович</a></li>
+                {% for member, photo in members %}
+                <li><a class="dropdown-item" href="#" data-value="{{ member.employee.id }}">
+                    {{ member.employee.last_name}} {{ member.employee.first_name }} {{ member.employee.patronymic }}</a>
+                </li>
+                {% endfor %}
               </ul>
             </div>
+            <input type="hidden" id="executor_id" name="executor">
+            <input type="hidden" name="team_id" value="{{ team.team_id }}">
             <div class="container d-flex justify-content-end"></div>
             <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
             <button type="submit" class="btn btn-primary m-1">Создать</button>
@@ -243,18 +256,20 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form>
+          <form id="editTeamForm" method="post" action="{% url 'edit_team' %}" enctype="multipart/form-data">
+            {% csrf_token %}
             <div class="mb-3">
               <label for="recipient-name" class="col-form-label">Название:</label>
-              <input type="text" class="form-control" id="team-name-tb">
+              <input type="text" class="form-control" id="team-name-tb" name="title" value="{{ team.title }}">
             </div>
             <div class="mb-3">
               <label for="message-text" class="col-form-label">Фото:</label>
-              <input class="form-control" type="file" id="photo-team-profile-tb">
+              <input class="form-control" type="file" id="photo-team-profile-tb" name="photo" accept="image/*">
             </div>
+            <input type="hidden" name="team_id" value="{{ team.team_id }}">
             <div class="container d-flex justify-content-end">
               <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
-              <button type="submit" class="btn btn-primary m-1">Создать</button>
+              <button type="submit" class="btn btn-primary m-1">Сохранить</button>
             </div>
           </form>
         </div>
@@ -314,18 +329,95 @@
 
 
   <script>
-    document.querySelectorAll('#CreateTaskModal .dropdown-item').forEach(item => {
-      item.addEventListener('click', event => {
-        event.preventDefault();
-        document.getElementById('task-executor-tb').value = event.target.innerText;
+    // document.querySelectorAll('#CreateTaskModal .dropdown-item').forEach(item => {
+    //   item.addEventListener('click', event => {
+    //     event.preventDefault();
+    //     document.getElementById('task-executor-tb').value = event.target.innerText;
+    //   });
+    // });
+
+    // create task script
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById('createTaskForm');
+      const editForm = document.getElementById('editTeamForm'); // Исправлено на editTeamForm
+      const dropdownItems = document.querySelectorAll('.dropdown-item');
+      const executorInput = document.getElementById('task-executor-tb');
+      const executorIdInput = document.getElementById('executor_id');
+
+      dropdownItems.forEach(item => {
+        item.addEventListener('click', function (event) {
+          event.preventDefault();
+          executorInput.value = item.innerText;
+          executorIdInput.value = item.getAttribute('data-value');
+        });
       });
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const formData = new FormData(form);
+        fetch(form.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+          }
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              clearFormFields();
+              window.location.reload();
+            } else {
+              alert('Ошибка при создании задачи');
+            }
+          })
+          .catch(error => {
+            console.error('Ошибка при отправке запроса:', error);
+          });
+      });
+
+      editForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const formData = new FormData(editForm);
+        const teamId = editForm.querySelector('input[name="team_id"]').value; // Получаем team_id из формы
+        fetch(editForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+          }
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              window.location.reload();
+            } else {
+              alert('Ошибка при редактировании команды');
+            }
+          })
+          .catch(error => {
+            console.error('Ошибка при отправке запроса:', error);
+          });
+      });
+
+      function clearFormFields() {
+        document.getElementById('recipient-name').value = '';
+        document.getElementById('message-text').value = '';
+        document.getElementById('task-executor-tb').value = '';
+        document.getElementById('executor_id').value = '';
+      }
     });
+
+
     document.querySelectorAll('#InviteUser .dropdown-item').forEach(item => {
       item.addEventListener('click', event => {
         event.preventDefault();
         document.getElementById('invite-user-tb').value = event.target.innerText;
       });
     });
+
+    // edit team profile script
+
 
 
     //TODO: Здесь и крестик тоже вызывает модальное окно

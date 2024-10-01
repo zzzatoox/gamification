@@ -37,89 +37,6 @@ def create_user_profile(sender, instance, created, **kwargs):
         UserProfile.objects.create(user=instance, rank=first_rank)
 
 
-class Task(models.Model):
-    task_id = models.AutoField(primary_key=True, verbose_name="ID задачи")
-    title = models.CharField(
-        max_length=30,
-        null=False,
-        verbose_name="Заголовок",
-        help_text="заголовок задачи",
-    )
-    description = models.TextField(
-        null=True, blank=True, verbose_name="Описание", help_text="Описание задачи"
-    )
-    xp_reward = models.PositiveIntegerField(
-        null=False,
-        verbose_name="Награда за выполнение (XP)",
-        help_text="Количество опыта за выполнение задачи",
-    )
-    coins_reward = models.PositiveIntegerField(
-        null=False,
-        verbose_name="Награда за выполнение (монеты)",
-        help_text="Количество монет за выполнение задачи",
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        null=False,
-        verbose_name="Дата создания",
-        help_text="Дата создания задачи",
-    )
-    deadline = models.DateTimeField(
-        null=True,
-        blank=True,
-        verbose_name="Крайний срок",
-        help_text="Крайний срок выполнения задачи",
-    )
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        verbose_name = "Задача"
-        verbose_name_plural = "Задачи"
-        ordering = ["-created_at"]
-
-
-class Achievement(models.Model):
-    achievement_id = models.AutoField(primary_key=True, verbose_name="ID достижения")
-    photo = models.ImageField(
-        upload_to="achievements/",
-        null=True,
-        blank=True,
-        verbose_name="Фото",
-        help_text="Фотография достижения",
-    )
-    title = models.CharField(
-        max_length=30,
-        null=False,
-        verbose_name="Заголовок",
-        help_text="Заголовок достижения",
-    )
-    description = models.CharField(
-        max_length=100,
-        null=False,
-        verbose_name="Описание",
-        help_text="Описание достижения",
-    )
-    xp_reward = models.PositiveIntegerField(
-        null=False,
-        verbose_name="Награда за выполнение (XP)",
-        help_text="Количество опыта за получение достижения",
-    )
-    coins_reward = models.PositiveIntegerField(
-        null=True,
-        verbose_name="Награда за выполнение (монеты)",
-        help_text="Количество монет за получение достижения",
-    )
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        verbose_name = "Достижение"
-        verbose_name_plural = "Достижения"
-
-
 class Team(models.Model):
     team_id = models.AutoField(primary_key=True, verbose_name="ID команды")
     owner = models.ForeignKey(
@@ -167,6 +84,95 @@ class Team(models.Model):
         total_xp = sum(member.employee.userprofile.xp for member in self.members.all())
         self.xp = total_xp
         self.save()
+
+
+class Task(models.Model):
+    task_id = models.AutoField(primary_key=True, verbose_name="ID задачи")
+    title = models.CharField(
+        max_length=30,
+        null=False,
+        verbose_name="Заголовок",
+        help_text="заголовок задачи",
+    )
+    description = models.TextField(
+        null=True, blank=True, verbose_name="Описание", help_text="Описание задачи"
+    )
+    team = models.ForeignKey(
+        Team,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Команда",
+        help_text="Команда, к которой относится задача",
+    )
+    xp_reward = models.PositiveIntegerField(
+        null=False,
+        verbose_name="Награда за выполнение (XP)",
+        help_text="Количество опыта за выполнение задачи",
+    )
+    coins_reward = models.PositiveIntegerField(
+        null=False,
+        verbose_name="Награда за выполнение (монеты)",
+        help_text="Количество монет за выполнение задачи",
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        null=False,
+        verbose_name="Дата создания",
+        help_text="Дата создания задачи",
+    )
+    deadline = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Крайний срок",
+        help_text="Крайний срок выполнения задачи",
+    )
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = "Задача"
+        verbose_name_plural = "Задачи"
+        ordering = ["-created_at"]
+
+
+class Achievement(models.Model):
+    achievement_id = models.AutoField(primary_key=True, verbose_name="ID достижения")
+    photo = models.ImageField(
+        upload_to="achievements/",
+        null=False,
+        verbose_name="Фото",
+        help_text="Фотография достижения",
+    )
+    title = models.CharField(
+        max_length=30,
+        null=False,
+        verbose_name="Заголовок",
+        help_text="Заголовок достижения",
+    )
+    description = models.TextField(
+        null=False,
+        verbose_name="Описание",
+        help_text="Описание достижения",
+    )
+    xp_reward = models.PositiveIntegerField(
+        null=False,
+        verbose_name="Награда за выполнение (XP)",
+        help_text="Количество опыта за получение достижения",
+    )
+    coins_reward = models.PositiveIntegerField(
+        null=True,
+        verbose_name="Награда за выполнение (монеты)",
+        help_text="Количество монет за получение достижения",
+    )
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = "Достижение"
+        verbose_name_plural = "Достижения"
 
 
 class TeamEmployee(models.Model):

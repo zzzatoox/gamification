@@ -1,18 +1,20 @@
 {% load static %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap" rel="stylesheet">
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light" style="font-size: 16pt;">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary" style="font-size: 16pt;" > 
     <div class="container-fluid">
-        <a class="navbar-brand ms-5" style="font-size: 16pt;" href="/">Motiv8</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item m-2">
+        <a class="navbar-brand mx-5" style="font-size: 30pt; font-family: Pirata One, cursive;" href="/">SWORD</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto my-lg-0">
+                <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Главная</a>
                 </li>
-                <li class="nav-item dropdown m-2">
+                <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" id="navbarDropdown" role="button"
                         data-bs-toggle="dropdown" aria-expanded="false">
                         Рейтинги
@@ -23,7 +25,7 @@
                     </ul>
                 </li>
                 {% if user.is_authenticated %}
-                <li class="nav-item m-2">
+                <li class="nav-item">
                     {% if is_in_team %}
                     <a class="nav-link active" href="{% url 'teams' %}">Команды</a>
                     {% else %}
@@ -32,19 +34,19 @@
                 </li>
                 {% endif %}
             </ul>
-            <ul class="navbar-nav  m-2 mb-lg-0">
+            <ul class="navbar-nav">
                 {% if user.is_authenticated %}
-                <li class="nav-item m-2">
+                <li class="nav-item">
                     <a class="nav-link active" href="{% url 'profile' user.id %}">{{user.username}}</a>
                 </li>
-                <li class="nav-item m-2">
+                <li class="nav-item">
                     <a class="nav-link active" href="{% url 'logout' %}">Выход</a>
                 </li>
                 {% else %}
-                <li class="nav-item m-2">
+                <li class="nav-item">
                     <a class="nav-link active" href="{% url 'authorization' %}">Вход</a>
                 </li>
-                <li class="nav-item m-2">
+                <li class="nav-item">
                     <a class="nav-link active" href="{% url 'registration' %}">Регистрация</a>
                 </li>
                 {% endif %}

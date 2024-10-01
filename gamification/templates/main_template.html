@@ -5,26 +5,41 @@
 </head>
 {% include "navbar.html" %}
 
-<body>
-  {% if error_message %}
-  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11;">
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
-      <div class="toast-header">
-        <span class="bi bi-exclamation-circle me-2"></span>
-        <strong class="me-auto">Внимание</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      <div class="toast-body">
-        <p class=""> {{ error_message }} </p>  
-      </div>
-    </div>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-  {% endif %}
+<body style="background-color: #F5F5F5;">
 
   {% block body %}
   {% endblock %}
+  
+
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11;">
+    {% if error_message %}
+      <div class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+        <div class="toast-header">
+          <strong class="me-auto">Внимание</strong>
+          <small>some_time</small>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          <p> {{ error_message }} </p>  
+        </div>
+      </div>
+    {% endif %}
+  </div>
 </body>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+      var toastList = toastElList.map(function (toastEl) {
+          return new bootstrap.Toast(toastEl)
+      })
+      toastList.forEach(toast => toast.show())
+
+      toastElList.forEach(function(toastEl) {
+          var timeElement = toastEl.querySelector('.toast-header small');
+          timeElement.textContent = new Date().toLocaleString();
+      });
+  });
+</script>
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 {% block js-scripts %}
 {% endblock %}  

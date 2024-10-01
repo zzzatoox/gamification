@@ -18,6 +18,8 @@ urlpatterns = [
     path("profile/<int:user_id>", views.profile, name="profile"),
     path("ratings_teams/", views.ratings_teams, name="ratings_teams"),
     path("ratings_users/", views.ratings_users, name="ratings_users"),
+    path("invite/", views.invite_in_team, name='invite'), #<int:team_id>
+    path("shop/", views.shop, name='shop'),
 ]
 
 if settings.DEBUG:

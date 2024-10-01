@@ -251,6 +251,8 @@ def ratings_users(request):
 
 @login_required(login_url="authorization")
 def team_detail_test(request, team_id):
+
+    # участники команды
     team = Team.objects.get(team_id=team_id)
     members = team.members.all()
     member_photos = [get_user_photo_url(member.employee) for member in members]
@@ -288,6 +290,31 @@ def team_detail_test(request, team_id):
         },
     )
 
+
+@login_required(login_url='authorization')
+def invite_in_team(request): #  (request, team_id)
+    # все пользователи
+    all_users = User.objects.exclude(is_superuser=True)
+    all_users_photos = [get_user_photo_url(user) for user in all_users]
+    all_users_with_photos = list(zip(all_users, all_users_photos))
+
+    return render(
+        request,
+        "invite.html",
+        {
+            "all_users_with_photos": all_users_with_photos,
+        },
+    )
+
+@login_required(login_url='authorization')
+def shop(request):
+    return render(
+        request,
+        "shop.html",
+        {
+            
+        },
+    )
 
 def get_user_photo_url(user):
     if user.photo:

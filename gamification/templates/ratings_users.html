@@ -67,6 +67,39 @@
 
         <!-- Пьедестал -->
         <div class="podium">
+            {% if top_users|length == 1 %}
+            <div class="podium-step">
+                <div class="position">2</div>
+                <!-- <img src="" alt=""> -->
+                <div class="user-name"></div>
+            </div>
+            <div class="podium-step">
+                <div class="position">1</div>
+                <img src="{{ top_users.0.photo_url }}" alt="{{ top_users.0.user.user.username }}">
+                <div class="user-name">{{ top_users.0.user.user.username }}</div>
+            </div>
+            <div class="podium-step">
+                <div class="position">3</div>
+                <!-- <img src="" alt=""> -->
+                <div class="user-name"></div>
+            </div>
+            {% elif top_users|length == 2 %}
+            <div class="podium-step">
+                <div class="position">2</div>
+                <img src="{{ top_users.1.photo_url }}" alt="{{ top_users.1.user.user.username }}">
+                <div class="user-name">{{ top_users.1.user.user.username }}</div>
+            </div>
+            <div class="podium-step">
+                <div class="position">1</div>
+                <img src="{{ top_users.0.photo_url }}" alt="{{ top_users.0.user.user.username }}">
+                <div class="user-name">{{ top_users.0.user.user.username }}</div>
+            </div>
+            <div class="podium-step">
+                <div class="position">3</div>
+                <!-- <img src="" alt=""> -->
+                <div class="user-name"></div>
+            </div>
+            {% else %}
             {% for user in top_users %}
             <div class="podium-step">
                 {% if forloop.counter == 1 %}
@@ -80,6 +113,7 @@
                 <div class="user-name">{{ user.user.user.username }}</div>
             </div>
             {% endfor %}
+            {% endif %}
         </div>
 
         <table class="table table-striped">

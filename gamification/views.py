@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.contrib.auth.forms import PasswordResetForm
 from django.conf import settings
 
-from .forms import CreateTaskForm
+from .forms import TaskForm, RegistrationForm, TeamForm
 
 from django.http import JsonResponse
 
@@ -17,12 +17,17 @@ from .models import (
     User,
     Team,
     TeamEmployee,
-    Achievement,
     AchievementEmployee,
     Task,
     TaskEmployee,
     UserProfile,
+    Status,
 )
+
+CREATED_STATUS = Status.objects.get_or_create(title="Создана")[0]
+IN_PROGRESS_STATUS = Status.objects.get_or_create(title="В процессе")[0]
+ON_TEST_STATUS = Status.objects.get_or_create(title="На проверке")[0]
+COMPLETED_STATUS = Status.objects.get_or_create(title="Выполнена")[0]
 
 
 # Create your views here.
@@ -35,94 +40,38 @@ def authorization(request):
         login_or_email = request.POST.get("login_or_email")
         password = request.POST.get("password")
 
-        # Проеверяем логин или email
-        if "@" in login_or_email:
-            UserModel = get_user_model()
-            try:
+        UserModel = get_user_model()
+        try:
+            if "@" in login_or_email:
                 user = UserModel.objects.get(email=login_or_email)
-                if user.check_password(password):
-                    auth_login(request, user)
-                    return redirect("home")
-                else:
-                    print("Неверный пароль для электронной почты")
-            except UserModel.DoesNotExist:
-                print("Пользователь с таким электронным адресом не существует")
+            else:
+                user = UserModel.objects.get(username=login_or_email)
+
+            if user.check_password(password):
+                auth_login(request, user)
+                return redirect("home")
+            else:
+                messages.error(request, "Неверный логин или пароль")
+        except UserModel.DoesNotExist:
+            messages.error(request, "Пользователь не найден")
         else:
             user = authenticate(request, username=login_or_email, password=password)
 
-        if user is not None:
-            auth_login(request, user)
-            return redirect("home")
-        else:
-            return render(
-                request,
-                "account/authorization.html",
-                {"error_message": "Неверный логин или пароль"},
-            )
+        return render(request, "account/authorization.html")
     else:
         return render(request, "account/authorization.html")
 
 
 def registration(request):
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        email = request.POST.get("email")
-        repeat_password = request.POST.get("repeat_password")
-        full_name = request.POST.get("full_name")
-
-        # Проверка на наличие символа @ в логине
-        if "@" in username:
-            return render(
-                request,
-                "account/registration.html",
-                {"error_message": "Логин не может содержать символ '@'"},
-            )
-
-        full_name = full_name.strip().split()
-
-        if len(full_name) < 2:
-            return render(
-                request,
-                "account/registration.html",
-                {"error_message": "Введите ФИО корректно, каждое слово через пробел"},
-            )
-        full_name = [name.capitalize() for name in full_name]
-        last_name = full_name[0]
-        first_name = full_name[1]
-        patronymic = full_name[-1] if len(full_name) > 1 else ""
-
-        if User.objects.filter(username=username).exists():
-            return render(
-                request,
-                "account/registration.html",
-                {"error_message": "Имя пользователя уже существует"},
-            )
-        elif User.objects.filter(email=email).exists():
-            return render(
-                request,
-                "account/registration.html",
-                {"error_message": "Email уже зарегистрирован"},
-            )
-        elif password != repeat_password:
-            return render(
-                request,
-                "account/registration.html",
-                {"error_message": "Пароли не совпадают"},
-            )
-        else:
-            user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password,
-                last_name=last_name,
-                first_name=first_name,
-                patronymic=patronymic,
-            )
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
             auth_login(request, user)
             return redirect("home")
     else:
-        return render(request, "account/registration.html")
+        form = RegistrationForm()
+    return render(request, "account/registration.html", {"form": form})
 
 
 def logout(request):
@@ -166,14 +115,17 @@ def get_teams(request):
 @login_required
 def create_team(request):
     if request.method == "POST":
-        title = request.POST.get("title")
-        photo = request.FILES.get("photo")
-        owner = request.user
-
-        team = Team.objects.create(owner=owner, title=title, photo=photo)
-        TeamEmployee.objects.create(team=team, employee=owner)
-        return redirect("team")
-    return render(request, "create_team.html")
+        form = TeamForm(request.POST, request.FILES)
+        if form.is_valid():
+            with transaction.atomic():
+                team = form.save(commit=False)
+                team.owner = request.user
+                team.save()
+                TeamEmployee.objects.create(team=team, employee=request.user)
+            return redirect("teams")
+    else:
+        form = TeamForm()
+    return render(request, "create_team.html", {"form": form})
 
 
 @login_required
@@ -190,32 +142,38 @@ def edit_team(request):
 
 def ratings_teams(request):
     team_list = Team.objects.all().order_by("-xp")
+    if team_list.count() > 0:
+        top_teams = team_list[:3]
 
-    top_teams = team_list[:3]
-    if len(top_teams) == 1:
-        top_teams_ordered = [top_teams[0]]
-    elif len(top_teams) == 2:
-        top_teams_ordered = [top_teams[1], top_teams[0]]
-    else:
-        top_teams_ordered = [top_teams[1], top_teams[0], top_teams[2]]
+        if len(top_teams) == 1:
+            top_teams_ordered = [top_teams[0]]
+        elif len(top_teams) == 2:
+            top_teams_ordered = [top_teams[1], top_teams[0]]
+        else:
+            top_teams_ordered = [top_teams[1], top_teams[0], top_teams[2]]
 
-    other_teams = team_list[3:]
+        other_teams = team_list[3:]
 
-    # получаем фотографии
-    top_teams_with_photos = [
-        {"team": team, "photo_url": get_team_photo_url(team)}
-        for team in top_teams_ordered
-    ]
+        # получаем фотографии
+        top_teams_with_photos = [
+            {"team": team, "photo_url": get_team_photo_url(team)}
+            for team in top_teams_ordered
+        ]
 
-    other_teams_with_photos = [
-        {"team": team, "photo_url": get_team_photo_url(team)} for team in other_teams
-    ]
+        other_teams_with_photos = [
+            {"team": team, "photo_url": get_team_photo_url(team)}
+            for team in other_teams
+        ]
 
-    return render(
-        request,
-        "ratings_teams.html",
-        {"top_teams": top_teams_with_photos, "other_teams": other_teams_with_photos},
-    )
+        return render(
+            request,
+            "ratings_teams.html",
+            {
+                "top_teams": top_teams_with_photos,
+                "other_teams": other_teams_with_photos,
+            },
+        )
+    return render(request, "ratings_teams.html")
 
 
 def ratings_users(request):
@@ -259,21 +217,13 @@ def team_detail_test(request, team_id):
     # получение задач
     tasks = Task.objects.filter(team=team)
 
-    waiting_tasks = []
-    in_progress_tasks = []
-    completed_tasks = []
+    waiting_tasks = tasks.filter(status=CREATED_STATUS)
+    in_progress_tasks = tasks.filter(status=IN_PROGRESS_STATUS)
 
-    for task in tasks:
-        task_assignments = TaskEmployee.objects.filter(task=task)
-        if not task_assignments.exists():
-            waiting_tasks.append(task)
-        else:
-            latest_assignment = task_assignments.latest("took_at")
-            if latest_assignment.completed_at:
-                if (timezone.now() - latest_assignment.completed_at).days <= 7:
-                    completed_tasks.append(task)
-            else:
-                in_progress_tasks.append(task)
+    seven_days_ago = timezone.now() - timezone.timedelta(days=7)
+    completed_tasks = tasks.filter(
+        status=COMPLETED_STATUS, completed_at__gte=seven_days_ago
+    )
 
     return render(
         request,
@@ -307,93 +257,121 @@ def profile(request, user_id):
     user = request.user
     is_user_owner = user.id == user_id
 
+    user_info = get_object_or_404(User, id=user_id)
+    user_game_info = get_object_or_404(UserProfile, user=user_info)
+    achievements = AchievementEmployee.objects.filter(employee=user_info)
+
+    context = {
+        "user_info": user_info,
+        "user_game_info": user_game_info,
+        "achievements": achievements,
+        "is_user_owner": is_user_owner,
+        "user_photo_url": get_user_photo_url(user_info),
+    }
+
     if is_user_owner:
-        user_info = User.objects.get(id=user.id)
-        user_game_info = UserProfile.objects.get(user=user_info)
-        tasks = TaskEmployee.objects.filter(employee=user_info)
-        achievements = AchievementEmployee.objects.filter(employee=user_info)
-
-        return render(
-            request,
-            "profile.html",
-            {
-                "user_info": user_info,
-                "user_game_info": user_game_info,
-                "achievements": achievements,
-                "tasks": tasks,
-                "is_user_owner": True,
-                "user_photo_url": get_user_photo_url(user_info),
-            },
+        tasks = TaskEmployee.objects.filter(
+            employee=user_info, status=IN_PROGRESS_STATUS
         )
-    else:
-        user_info = User.objects.get(id=user_id)
-        user_game_info = UserProfile.objects.get(user=user_info)
-        achievements = AchievementEmployee.objects.filter(employee=user_info)
+        context["tasks"] = tasks
 
-        return render(
-            request,
-            "profile.html",
-            {
-                "user_info": user_info,
-                "user_game_info": user_game_info,
-                "achievements": achievements,
-                "is_user_owner": False,
-                "user_photo_url": get_user_photo_url(user_info),
-            },
-        )
+    return render(request, "profile.html", context)
 
 
 @login_required
 def create_task(request):
     if request.method == "POST":
-        title = request.POST.get("title")
-        description = request.POST.get("description")
-        executor_id = request.POST.get("executor")
-        team_id = request.POST.get("team_id")
+        with transaction.atomic():
+            title = request.POST.get("title")
+            description = request.POST.get("description")
+            team_id = request.POST.get("team_id")
 
-        print(f"title: {title}")
-        print(f"description: {description}")
-        print(f"team_id: {team_id}")
-        print(f"executor_id: {executor_id}")
+            team = Team.objects.get(team_id=team_id)
 
-        team = Team.objects.get(team_id=team_id)
-
-        task = Task.objects.create(
-            title=title,
-            description=description,
-            team=team,
-            xp_reward=10,  # TODO: подставить реальное значение
-            coins_reward=5,  # TODO: подставить реальное значение
-        )
-
-        if executor_id:
-            executor = User.objects.get(id=executor_id)
-            TaskEmployee.objects.create(
-                task=task,
-                employee=executor,
+            Task.objects.create(
+                title=title,
+                description=description,
+                team=team,
+                xp_reward=10,  # TODO: подставить реальное значение
+                coins_reward=5,  # TODO: подставить реальное значение
+                status_id=CREATED_STATUS,
             )
 
-        return JsonResponse({"success": True})
+            return JsonResponse({"success": True})
 
     return JsonResponse({"success": False, "error": "Invalid request method"})
 
 
 @login_required
-def complete_task(request, task_id, employee_id):
-    task_employee = get_object_or_404(
-        TaskEmployee, task_id=task_id, employee_id=employee_id
-    )
+def assign_task(request):
+    if request.method == "POST":
+        with transaction.atomic():
+            task_id = request.POST.get("task_id")
+            executor_id = request.POST.get("executor")
 
-    if task_employee.completed_at:
-        messages.error(request, "Задача уже выполнена")
-        return redirect("task_detail", task_id=task_id)
+            task_employee = get_object_or_404(
+                TaskEmployee, task_id=task_id, employee_id=executor_id
+            )
+            task = task_employee.task
 
-    task_employee.completed_at = timezone.now()
-    task_employee.save()
+            task_employee.status = IN_PROGRESS_STATUS
+            task_employee.save()
 
-    user = task_employee.employee
-    user.xp += task_employee.task.xp_reward
-    user.save()
+            task.status = IN_PROGRESS_STATUS
+            task.save()
 
-    messages.success(request, "Задача выполнена")
-    return redirect("task_detail", task_id=task_id)
+            return JsonResponse({"success": True})
+    return JsonResponse({"success": False, "error": "Invalid request method"})
+
+
+@login_required
+def submit_task(request):
+    if request.method == "POST":
+        with transaction.atomic():
+            task_id = request.POST.get("task_id")
+            employee_id = request.POST.get("employee_id")
+
+            task_employee = get_object_or_404(
+                TaskEmployee, task_id=task_id, employee_id=employee_id
+            )
+            task = task_employee.task
+
+            task.status = ON_TEST_STATUS
+            task.save()
+
+            task_employee.status = ON_TEST_STATUS
+            task_employee.save()
+
+            return JsonResponse({"success": True})
+    return JsonResponse({"success": False, "error": "Invalid request method"})
+
+
+@login_required
+def complete_task(request):
+    if request.method == "POST":
+        with transaction.atomic():
+            task_id = request.POST.get("task_id")
+            employee_id = request.POST.get("employee_id")
+
+            # получаю объект задачи и связи
+            task_employee = get_object_or_404(
+                TaskEmployee, task_id=task_id, employee_id=employee_id
+            )
+            task = task_employee.task
+
+            # изменяю статус задачи и связи
+            task_employee.status = COMPLETED_STATUS
+            task_employee.completed_at = timezone.now()
+            task_employee.save()
+
+            task.status = COMPLETED_STATUS
+            task.save()
+
+            # получаю объект профиля пользователя
+            employee_profile = UserProfile.objects.get(user=task_employee.employee)
+
+            # изменяю количество опыта и монет
+            employee_profile.complete_task(task.xp_reward, task.coins_reward)
+
+            return JsonResponse({"success": True})
+    return JsonResponse({"success": False, "error": "Invalid request method"})

@@ -104,7 +104,7 @@
       </div>
     </div>
   </div>
-  <!-- Modal-window TaskDetail -->
+  <!-- Modal-window CreateTeam -->
   <div class="modal fade" id="CreateTeam" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -113,26 +113,60 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label">Название</label>
-            <input type="text" class="form-control" id="create-team-name-tb">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Фотография</label>
-            <input type="file" class="form-control" id="create-team-photo-tb" accept="image/*" rows="3"></input>
-          </div>
-          <div class="d-flex justify-content-center">
-            <button class="btn btn-primary" type="submit">Создать команду</button>
-          </div>
+          <form id="createTeamForm" method="post" action="{% url 'create_team' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label">Название</label>
+              <input type="text" class="form-control" id="create-team-name-tb" name="title">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Фотография</label>
+              <input type="file" class="form-control" id="create-team-photo-tb" name="photo" accept="image/*"
+                rows="3"></input>
+            </div>
+            <div class="d-flex justify-content-center">
+              <button class="btn btn-primary" type="submit">Создать команду</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
+  </div>
 </body>
 {% endblock %}
 
 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('createTeamForm');
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      const formData = new FormData(form);
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            clearFormFields();
+            window.location.reload();
+          } else {
+            alert('Ошибка при создании команды');
+          }
+        })
+        .catch(error => {
+          console.error('Ошибка при отправке запроса:', error);
+        });
+    });
+  });
+</script>
+
+
 {% block js-scripts %}
-
-
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 {% endblock %}

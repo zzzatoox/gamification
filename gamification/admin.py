@@ -12,6 +12,7 @@ from .models import (
     Notification,
     Rank,
     UserProfile,
+    Status,
 )
 
 
@@ -28,3 +29,4 @@ admin.site.register(Inventory)
 admin.site.register(Notification)
 admin.site.register(Rank)
 admin.site.register(UserProfile)
+admin.site.register(Status)

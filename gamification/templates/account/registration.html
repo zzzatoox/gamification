@@ -6,101 +6,117 @@
 {% endblock %}
 
 {% block body %}
-  <section>
+<section>
     <div class="px-4 py-5 px-md-5 text-center text-lg-start" style="background-color: hsl(0, 0%, 96%)">
-      <div class="container">
-        <div class="row gx-lg-5 align-items-center">
-          <div class="col-lg-6 mb-5 mb-lg-0">
-            <h1 class="my-5 display-5 fw-bold ls-tight">
-              Начни работать и играть <br />
-              <span class="text-primary">прямо сейчас</span>
-            </h1>
-            <p style="color: hsl(217, 10%, 50.8%); font-size:x-large">
-              Motiv8 - самый продвинутый и современный подход к скучной работе.
-              Мы предоставляем возможность играть и быть более продуктивными для твоей компании.
-            </p>
-          </div>
-  
-          <div class="col-lg-6 mb-5 mb-lg-0">
-            <div class="card">
-              <div class="card-body py-5 px-md-5">
-                <form method="POST" action="{% url 'registration' %}">
-                  {% csrf_token %}
-                  <div data-mdb-input-init class="form-outline mb-4">
-                    <div class="input-group">
-                      <span class="input-group-text" id="inputGroupPrepend">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                          class="bi bi-person" viewBox="0 0 16 16">
-                          <path
-                            d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z" />
-                        </svg>
-                      </span>
-                      <input type="text" id="user-fullname-tb" placeholder="Иванов Иван Иванович" required maxlength="150" name="full_name" class="form-control" />
-                    </div>
-                    <label class="form-label" for="form3Example1">Ваше ФИО</label>
-                  </div>
-  
-                  <div data-mdb-input-init class="form-outline mb-4">
-                    <div class="input-group">
-                      <span class="input-group-text" id="inputGroupPrepend">@</span>
-                      <input type="text" name="username" placeholder="nickname" maxlength="20" required id="login-tb" class="form-control" />
-                    </div>
-                    <label class="form-label">Логин</label>
-                  </div>
-  
-                  <div data-mdb-input-init class="form-outline mb-4">
-                    <div class="input-group">
-                      <span class="input-group-text" id="inputGroupPrepend">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                          class="bi bi-envelope" viewBox="0 0 16 16">
-                          <path
-                            d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z" />
-                        </svg>
-                      </span>
-                      <input type="email" name="email" placeholder="ivanivanov@mail.ru" required maxlength="255" id="email-tb" class="form-control" />
-                    </div>
-                    <label class="form-label">Почта</label>
-                  </div>
-  
-                  <div data-mdb-input-init class="form-outline mb-4">
-                    <div class="input-group">
-                      <span class="input-group-text" id="inputGroupPrepend">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                          class="bi bi-lock-fill" viewBox="0 0 16 16">
-                          <path
-                            d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2" />
-                        </svg>
-                      </span>
-                      <input type="password" name="password" id="password-tb" required placeholder="••••••••••••••" maxlength="50" class="form-control" />
-                    </div>
-                    <label class="form-label">Пароль</label>
-                  </div>
-  
-                  <div data-mdb-input-init class="form-outline mb-4">
-                    <div class="input-group">
-                      <span class="input-group-text" id="inputGroupPrepend">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                          class="bi bi-lock-fill" viewBox="0 0 16 16">
-                          <path
-                            d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2" />
-                        </svg>
-                      </span>
-                      <input type="password" name="repeat_password" required placeholder="••••••••••••••" id="repeat-password-tb" maxlength="50"
-                        class="form-control" />
-                    </div>
-                    <label class="form-label">Повторите пароль</label>
-                  </div>
-                  <button type="submit" class="btn btn-lg btn-primary btn-block mb-2 w-100">Зарегистрироваться</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-{% endblock %}
+        <div class="container">
+            <div class="row gx-lg-5 align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <h1 class="my-5 display-5 fw-bold ls-tight">
+                        Начни работать и играть <br />
+                        <span class="text-primary">прямо сейчас</span>
+                    </h1>
+                    <p style="color: hsl(217, 10%, 50.8%); font-size:x-large">
+                        Motiv8 - самый продвинутый и современный подход к скучной работе.
+                        Мы предоставляем возможность играть и быть более продуктивными для твоей компании.
+                    </p>
+                </div>
 
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <div class="card">
+                        <div class="card-body py-5 px-md-5">
+                            <form method="POST" action="{% url 'registration' %}">
+                                {% csrf_token %}
+                                {{ form.non_field_errors }}
+
+                                <div class="form-outline mb-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text" id="inputGroupPrepend">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z" />
+                                            </svg>
+                                        </span>
+                                        <input type="text" id="user-fullname-tb" placeholder="Иванов Иван Иванович"
+                                            required maxlength="150" name="{{ form.full_name.name }}"
+                                            class="form-control"
+                                            value="{{ form.full_name.value|default_if_none:'' }}" />
+                                    </div>
+                                    <label class="form-label" for="user-fullname-tb">Ваше ФИО</label>
+                                    {{ form.full_name.errors }}
+                                </div>
+
+                                <div class="form-outline mb-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text" id="inputGroupPrepend">@</span>
+                                        <input type="text" name="{{ form.username.name }}" placeholder="nickname"
+                                            maxlength="20" required id="login-tb" class="form-control"
+                                            value="{{ form.username.value|default_if_none:'' }}" />
+                                    </div>
+                                    <label class="form-label" for="login-tb">Логин</label>
+                                    {{ form.username.errors }}
+                                </div>
+
+                                <div class="form-outline mb-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text" id="inputGroupPrepend">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z" />
+                                            </svg>
+                                        </span>
+                                        <input type="email" name="{{ form.email.name }}"
+                                            placeholder="ivanivanov@mail.ru" required maxlength="255" id="email-tb"
+                                            class="form-control" value="{{ form.email.value|default_if_none:'' }}" />
+                                    </div>
+                                    <label class="form-label" for="email-tb">Почта</label>
+                                    {{ form.email.errors }}
+                                </div>
+
+                                <div class="form-outline mb-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text" id="inputGroupPrepend">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2" />
+                                            </svg>
+                                        </span>
+                                        <input type="password" name="{{ form.password1.name }}" id="password-tb"
+                                            required placeholder="••••••••••••••" maxlength="50" class="form-control" />
+                                    </div>
+                                    <label class="form-label" for="password-tb">Пароль</label>
+                                    {{ form.password1.errors }}
+                                </div>
+
+                                <div class="form-outline mb-4">
+                                    <div class="input-group">
+                                        <span class="input-group-text" id="inputGroupPrepend">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                fill="currentColor" class="bi bi-lock-fill" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2" />
+                                            </svg>
+                                        </span>
+                                        <input type="password" name="{{ form.password2.name }}" required
+                                            placeholder="••••••••••••••" id="repeat-password-tb" maxlength="50"
+                                            class="form-control" />
+                                    </div>
+                                    <label class="form-label" for="repeat-password-tb">Повторите пароль</label>
+                                    {{ form.password2.errors }}
+                                </div>
+                                <button type="submit"
+                                    class="btn btn-lg btn-primary btn-block mb-2 w-100">Зарегистрироваться</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
 
 {% block js-scripts %}
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>

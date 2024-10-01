@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # apps
-    "gamification",
+    "gamification.apps.GamificationConfig",
 ]
 
 MIDDLEWARE = [
@@ -66,7 +66,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 # app
-                "gamification.context_processors.team_membership",
+                # "gamification.context_processors.team_membership",
             ],
         },
     },

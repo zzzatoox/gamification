@@ -34,7 +34,25 @@ class User(AbstractUser):
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         first_rank = Rank.objects.order_by("level").first()
-        UserProfile.objects.create(user=instance, rank=first_rank)
+        user_profile = UserProfile.objects.create(user=instance, rank=first_rank)
+
+        # выдаю достижение "Меч в сердце"
+        achievement = Achievement.objects.filter(title="Меч в сердце").first()
+        if (
+            achievement
+            and not AchievementEmployee.objects.filter(
+                achievement=achievement, employee=instance
+            ).exists()
+        ):
+            AchievementEmployee.objects.create(
+                achievement=achievement, employee=instance
+            )
+
+            user_profile.xp += achievement.xp_reward
+            if achievement.coins_reward:
+                user_profile.coins += achievement.coins_reward
+            user_profile.update_rank()
+            user_profile.save()
 
 
 class Team(models.Model):
@@ -86,6 +104,23 @@ class Team(models.Model):
         self.save()
 
 
+class Status(models.Model):
+    status_id = models.AutoField(primary_key=True, verbose_name="ID статуса")
+    title = models.CharField(
+        max_length=30,
+        null=False,
+        verbose_name="Заголовок",
+        help_text="Заголовок статуса",
+    )
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = "Статус"
+        verbose_name_plural = "Статусы"
+
+
 class Task(models.Model):
     task_id = models.AutoField(primary_key=True, verbose_name="ID задачи")
     title = models.CharField(
@@ -127,6 +162,14 @@ class Task(models.Model):
         verbose_name="Крайний срок",
         help_text="Крайний срок выполнения задачи",
     )
+    status = models.ForeignKey(
+        Status,
+        on_delete=models.CASCADE,
+        null=False,
+        default=1,
+        verbose_name="Статус",
+        help_text="Статус выполнения задачи",
+    )
 
     def __str__(self):
         return self.title
@@ -138,7 +181,10 @@ class Task(models.Model):
 
 
 class Achievement(models.Model):
-    achievement_id = models.AutoField(primary_key=True, verbose_name="ID достижения")
+    achievement_id = models.AutoField(
+        primary_key=True,
+        verbose_name="ID достижения",
+    )
     photo = models.ImageField(
         upload_to="achievements/",
         null=False,
@@ -241,15 +287,15 @@ class AchievementEmployee(models.Model):
         verbose_name_plural = "Полученные достижения"
 
 
-@receiver(post_save, sender=AchievementEmployee)
-def update_user_profile_on_achievement(sender, instance, **kwargs):
-    user_profile = instance.employee.userprofile
-    achievement = instance.achievement
-    user_profile.xp += achievement.xp_reward
-    if achievement.coins_reward:
-        user_profile.coins += achievement.coins_reward
-    user_profile.update_rank()
-    user_profile.save()
+# @receiver(post_save, sender=AchievementEmployee)
+# def update_user_profile_on_achievement(sender, instance, **kwargs):
+#     user_profile = instance.employee.userprofile
+#     achievement = instance.achievement
+#     user_profile.xp += achievement.xp_reward
+#     if achievement.coins_reward:
+#         user_profile.coins += achievement.coins_reward
+#     user_profile.update_rank()
+#     user_profile.save()
 
 
 class TaskEmployee(models.Model):
@@ -278,6 +324,14 @@ class TaskEmployee(models.Model):
         blank=True,
         verbose_name="Дата завершения задачи",
         help_text="Дата, когда задача была завершена",
+    )
+    status = models.ForeignKey(
+        Status,
+        on_delete=models.CASCADE,
+        null=True,
+        default=1,
+        verbose_name="Статус",
+        help_text="Статус выполнения задачи",
     )
 
     def __str__(self):

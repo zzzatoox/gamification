@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.forms import PasswordResetForm
 from django.conf import settings
+from django.db.models import Q
 
 from .forms import TaskForm, RegistrationForm, TeamForm
 
@@ -209,7 +210,6 @@ def ratings_users(request):
 
 @login_required(login_url="authorization")
 def team_detail_test(request, team_id):
-
     # участники команды
     team = Team.objects.get(team_id=team_id)
     members = team.members.all()
@@ -224,8 +224,8 @@ def team_detail_test(request, team_id):
 
     seven_days_ago = timezone.now() - timezone.timedelta(days=7)
     completed_tasks = tasks.filter(
-        status=COMPLETED_STATUS, completed_at__gte=seven_days_ago
-    )
+        Q(assignments__completed_at__gte=seven_days_ago) | Q(status=ON_TEST_STATUS)
+    ).distinct()
 
     return render(
         request,
@@ -241,8 +241,8 @@ def team_detail_test(request, team_id):
     )
 
 
-@login_required(login_url='authorization')
-def invite_in_team(request): #  (request, team_id)
+@login_required(login_url="authorization")
+def invite_in_team(request):  #  (request, team_id)
     # все пользователи
     all_users = User.objects.exclude(is_superuser=True)
     all_users_photos = [get_user_photo_url(user) for user in all_users]
@@ -256,15 +256,15 @@ def invite_in_team(request): #  (request, team_id)
         },
     )
 
-@login_required(login_url='authorization')
+
+@login_required(login_url="authorization")
 def shop(request):
     return render(
         request,
         "shop.html",
-        {
-            
-        },
+        {},
     )
+
 
 def get_user_photo_url(user):
     if user.photo:
@@ -321,12 +321,35 @@ def create_task(request):
                 team=team,
                 xp_reward=10,  # TODO: подставить реальное значение
                 coins_reward=5,  # TODO: подставить реальное значение
-                status_id=CREATED_STATUS,
+                status=CREATED_STATUS,
             )
 
             return JsonResponse({"success": True})
 
     return JsonResponse({"success": False, "error": "Invalid request method"})
+
+
+@login_required
+def take_task(request, task_id):
+    task = get_object_or_404(Task, task_id=task_id)
+    user = request.user
+
+    # Проверка, что задача еще не взята другим пользователем
+    if TaskEmployee.objects.filter(task=task).exists():
+        return JsonResponse(
+            {"success": False, "message": "Задача уже взята другим пользователем."}
+        )
+
+    # Создаем запись о том, что задача взята пользователем
+    TaskEmployee.objects.create(
+        task=task, employee=user, status=Status.objects.get(title="В процессе")
+    )
+
+    # Обновляем статус задачи
+    task.status = Status.objects.get(title="В процессе")
+    task.save()
+
+    return JsonResponse({"success": True, "message": "Задача успешно взята."})
 
 
 @login_required

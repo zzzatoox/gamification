@@ -25,10 +25,10 @@
     padding: 15px;
     margin-bottom: 15px;
   }
+
   .scrum-card {
     cursor: pointer;
   }
-
 </style>
 {% endblock %}
 
@@ -48,18 +48,24 @@
               </span>
               <h5 class="my-3">{{ team.title }}</h5>
               {% if user == team.owner %}
-              <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#EditTeamProfile">Редактировать
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-                  <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
-                </svg>  
+              <button class="btn btn-outline-dark" data-bs-toggle="modal"
+                data-bs-target="#EditTeamProfile">Редактировать
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pencil"
+                  viewBox="0 0 16 16">
+                  <path
+                    d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
+                </svg>
               </button>
               <a href="{% url 'invite' %}">
-                <button class="btn btn-outline-dark"> 
-                      Пригласить
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-person-add" viewBox="0 0 16 16">
-                        <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
-                        <path d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"/>
-                      </svg></button>
+                <button class="btn btn-outline-dark">
+                  Пригласить
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                    class="bi bi-person-add" viewBox="0 0 16 16">
+                    <path
+                      d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4" />
+                    <path
+                      d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z" />
+                  </svg></button>
               </a>
               {% endif %}
               <div class="mb-2">
@@ -86,9 +92,10 @@
             <div class="col">
               <div class="card mb-4 mb-md-0">
                 <div class="row text-center">
-                    <h3 class="mt-2">Участники</h3>
+                  <h3 class="mt-2">Участники</h3>
                 </div>
-                <div class="card-body" style="overflow-y: auto; {% if user == team.owner %} height:354px; {% else %} height:299px; {% endif %}">
+                <div class="card-body"
+                  style="overflow-y: auto; {% if user == team.owner %} height:354px; {% else %} height:299px; {% endif %}">
                   <!-- Карточка участника -->
                   {% for member, photo_url in members %}
                   <div class="card m-2">
@@ -103,7 +110,7 @@
                       </div>
                       <div class="col-2" style="font-size: 14pt;">
                         {% if member.employee == team.owner %}
-                         Глава
+                        Глава
                         {% else %}
                         Участник
                         {% endif %}
@@ -131,11 +138,15 @@
               </div>
               {% if user == team.owner %}
               <div class="col-3 d-flex justify-content-end">
-                <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#CreateTaskModal">Добавить  
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-clipboard-plus ms-1" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7"/>
-                    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/>
-                    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/>
+                <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#CreateTaskModal">Добавить
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                    class="bi bi-clipboard-plus ms-1" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                      d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7" />
+                    <path
+                      d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z" />
+                    <path
+                      d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z" />
                   </svg>
                 </button>
               </div>
@@ -200,8 +211,11 @@
                       <div class="col-10">
                         <h5>{{ task.title }}</h5>
                         <!-- Проверку в зависимости от статуса -->
+                        {% if task.status.title == "На проверке" %}
                         <p style="font-style: italic;">На проверке</p>
+                        {% else %}
                         <p style="font-style: italic;">Выполнено</p>
+                        {% endif %}
                         <!-- ^^^^ -->
                       </div>
                       <div class="row"></div>
@@ -238,17 +252,17 @@
               <label for="message-text" class="col-form-label">Описание</label>
               <textarea class="form-control" id="message-text" name="description"></textarea>
             </div>
-           
+
             <input type="hidden" id="executor_id" name="executor">
             <input type="hidden" name="team_id" value="{{ team.team_id }}">
             <div class="container d-flex justify-content-end">
               <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
               <button type="submit" class="btn btn-primary m-1">Создать</button>
             </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
   </div>
 
 
@@ -301,8 +315,11 @@
           </div>
           <div class="container d-flex justify-content-end">
             <!-- Если овнер -->
-             <button class="btn btn-primary m-1" data-bs-target="#AddExecutor" data-bs-toggle="modal">Назначить исполнителя</button>
-             <!--  -->
+            {% if user == team.owner %}
+            <button class="btn btn-primary m-1" data-bs-target="#AddExecutor" data-bs-toggle="modal">Назначить
+              исполнителя</button>
+            {% endif %}
+            <!--  -->
             <button type="submit" class="btn btn-success m-1">Взять задачу</button>
           </div>
         </div>
@@ -351,7 +368,9 @@
             <textarea class="form-control" readonly id="task-detail-done-description-tb" rows="3"></textarea>
             <!-- Если сообщение на проверке, и если его смотрит овнер, то отобразить кнопку "принять" -->
             <div class="container d-flex justify-content-end">
+              {% if user == team.owner %}
               <button class="btn btn-sm btn-success">Принять</button>
+              {% endif %}
             </div>
             <!--  -->
           </div>
@@ -361,7 +380,8 @@
   </div>
 
   <!-- ModalWindow AddExecutor -->
-  <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="AddExecutor" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="AddExecutor" tabindex="-1"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
@@ -373,16 +393,21 @@
             <!-- Карточка пользователя -->
             {% for member, photo_url in members %}
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="flexRadioDefault" id="member_{{ member.employee.id }}" checked>
-              <div class="card executor-card mb-1" data-member-id="{{ member.employee.id }}" data-name="{{ member.employee.last_name }} {{ member.employee.first_name }} {{ member.employee.patronymic }}">
+              <input class="form-check-input" type="radio" name="flexRadioDefault" id="member_{{ member.employee.id }}"
+                checked>
+              <div class="card executor-card mb-1" data-member-id="{{ member.employee.id }}"
+                data-name="{{ member.employee.last_name }} {{ member.employee.first_name }} {{ member.employee.patronymic }}">
                 <div class="card-body">
-                  <a class="card-link" style="text-decoration: none; color: inherit; cursor:pointer" data-value="{{ member.employee.id }}">
+                  <a class="card-link" style="text-decoration: none; color: inherit; cursor:pointer"
+                    data-value="{{ member.employee.id }}">
                     <div class="row align-items-center">
                       <div class="col-2 m-1">
-                        <img src="{{ photo_url }}" class="card-img-top rounded-circle mx-auto d-block m-1" style="width: 50px; height: 50px;">
+                        <img src="{{ photo_url }}" class="card-img-top rounded-circle mx-auto d-block m-1"
+                          style="width: 50px; height: 50px;">
                       </div>
                       <div class="col-8" style="font-size: 14.5pt;">
-                        <p><span style="font-style: italic;">ФИО: </span>{{ member.employee.last_name }} {{ member.employee.first_name }} {{ member.employee.patronymic }}</p>
+                        <p><span style="font-style: italic;">ФИО: </span>{{ member.employee.last_name }} {{
+                          member.employee.first_name }} {{ member.employee.patronymic }}</p>
                         <p><span style="font-style: italic;">Логин: </span>{{ member.employee.username }}</p>
                       </div>
                     </div>
@@ -494,7 +519,7 @@
       const columnClass = column ? column.className : 'unknown';
       item.dataset.bsToggle = "modal";
 
-      switch(columnClass) {
+      switch (columnClass) {
         case 'scrum-column scrum-column-todo':
           item.dataset.bsTarget = "#TaskDetailTodo";
           break;
@@ -506,64 +531,70 @@
           break;
       }
 
-      // Добавляем обработчик события для кнопки удаления
-      const deleteButton = item.querySelector('.delete-card');
-      if (deleteButton) {
-        deleteButton.addEventListener('click', (event) => {
-          event.preventDefault();
-        });
-      }
+      item.addEventListener('click', function () {
+        fillTaskDetail(title, description, columnClass, item);
+
+        // Проверка, является ли текущий пользователь исполнителем задачи
+        const currentUser = '{{ request.user.id }}';
+        const taskExecutor = item.dataset.executorId;
+
+        if (currentUser === taskExecutor) {
+          submitTaskButton.style.display = 'block';
+        } else {
+          submitTaskButton.style.display = 'none';
+        }
+      });
     });
 
-function fillTaskDetail(title, description, column, item) {
-    switch(column) {
+    function fillTaskDetail(title, description, column, item) {
+      switch (column) {
         case 'scrum-column scrum-column-todo':
-            document.getElementById('task-detail-todo-name-tb').value = title;
-            document.getElementById('task-detail-todo-description-tb').value = description;
-            break;
+          document.getElementById('task-detail-todo-name-tb').value = title;
+          document.getElementById('task-detail-todo-description-tb').value = description;
+          break;
         case 'scrum-column scrum-column-inprogress':
-            document.getElementById('task-detail-in-progress-name-tb').value = title;
-            document.getElementById('task-detail-in-progress-description-tb').value = description;
-            break;
+          document.getElementById('task-detail-in-progress-name-tb').value = title;
+          document.getElementById('task-detail-in-progress-description-tb').value = description;
+          break;
         case 'scrum-column scrum-column-done':
-            document.getElementById('task-detail-done-name-tb').value = title;
-            document.getElementById('task-detail-done-description-tb').value = description;
-            break;
-    }
-}
-
-  document.querySelectorAll('.card').forEach(card => {
-    card.addEventListener('click', function() {
-      const memberId = this.getAttribute('data-member-id');
-      const radioButton = document.getElementById(`member_${memberId}`);
-      if (radioButton) {
-        radioButton.checked = true;
+          document.getElementById('task-detail-done-name-tb').value = title;
+          document.getElementById('task-detail-done-description-tb').value = description;
+          break;
       }
-    });
-  });
-  document.getElementById('add-executor-tb').addEventListener('input', function() {
-  const filterValue = this.value.toLowerCase();
-  const formChecks = document.querySelectorAll('.form-check');
-
-  formChecks.forEach(formCheck => {
-    const card = formCheck.querySelector('.executor-card');
-    const name = card.getAttribute('data-name').toLowerCase();
-    if (name.includes(filterValue)) {
-      formCheck.style.display = 'block';
-    } else {
-      formCheck.style.display = 'none';
     }
-  });
-});
-  document.getElementById('cancel-btn').addEventListener('click', function() {
-    location.reload();
-  });
-  document.querySelectorAll('.close-button').forEach(button => {
-  button.addEventListener('click', event => {
-    event.preventDefault(); 
-    // Логика для удаления задачи
-  });
-});
+
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', function () {
+        const memberId = this.getAttribute('data-member-id');
+        const radioButton = document.getElementById(`member_${memberId}`);
+        if (radioButton) {
+          radioButton.checked = true;
+        }
+      });
+    });
+    document.getElementById('add-executor-tb').addEventListener('input', function () {
+      const filterValue = this.value.toLowerCase();
+      const formChecks = document.querySelectorAll('.form-check');
+
+      formChecks.forEach(formCheck => {
+        const card = formCheck.querySelector('.executor-card');
+        const name = card.getAttribute('data-name').toLowerCase();
+        if (name.includes(filterValue)) {
+          formCheck.style.display = 'block';
+        } else {
+          formCheck.style.display = 'none';
+        }
+      });
+    });
+    document.getElementById('cancel-btn').addEventListener('click', function () {
+      location.reload();
+    });
+    document.querySelectorAll('.close-button').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        // Логика для удаления задачи
+      });
+    });
   </script>
 
 

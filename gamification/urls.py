@@ -15,13 +15,14 @@ urlpatterns = [
     path("team_detail/<int:team_id>/", views.team_detail_test, name="team_detail"),
     path("edit_team/", views.edit_team, name="edit_team"),
     path("create_task/", views.create_task, name="create_task"),
+    path("take_task/<int:task_id>/", views.take_task, name="take_task"),
     path("assign_task/", views.assign_task, name="assign_task"),
     path("submit_task/", views.submit_task, name="submit_task"),
     path("profile/<int:user_id>", views.profile, name="profile"),
     path("ratings_teams/", views.ratings_teams, name="ratings_teams"),
     path("ratings_users/", views.ratings_users, name="ratings_users"),
-    path("invite/", views.invite_in_team, name='invite'), #<int:team_id>
-    path("shop/", views.shop, name='shop'),
+    path("invite/", views.invite_in_team, name="invite"),  # <int:team_id>
+    path("shop/", views.shop, name="shop"),
 ]
 
 if settings.DEBUG:

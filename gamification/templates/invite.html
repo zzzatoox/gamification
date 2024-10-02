@@ -11,14 +11,16 @@
   <div class="text-center">
     <h1>Приглашение в команду {{team.title}}</h1>
   </div>
-  <form method="POST" action="">
+  <form method="POST" action="{% url 'invite' %}">
+    {% csrf_token %}
     <input type="text" class="form-control mb-4" id="add-executor-tb" placeholder="Кого вы хотите добавить?">
     <input type="hidden" id="add-executor-id" name="selected_member_id">
     <div class="card-body p-3" style="overflow-y: auto; overflow-x: hidden; max-height: 700px;">
       <!-- Карточка пользователя -->
       {% for member, photo_url in all_users_with_photos %}
       <div class="form-check">
-        <input class="form-check-input" type="radio" name="flexRadioDefault" id="member_{{ member.id }}" checked>
+        <input class="form-check-input" type="radio" name="employee_id" id="{{ member.member_id }}" checked>
+        <input type="hidden" name="team_id" value="{{team.team_id}}">
         <div class="card executor-card mb-1" data-member-id="{{ member.id }}"
           data-name="{{ member.last_name }} {{ member.first_name }} {{ member.patronymic }}">
           <div class="card-body">
@@ -46,71 +48,60 @@
       <button class="btn btn-success m-2" type="submit">Добавить</button>
   </form>
 </div>
-</div>
-<<<<<<< HEAD <div class="d-flex justify-content-end">
-  <button class="btn btn-danger m-2" id="cancel-btn" href="#">Отменить</button>
-  <button class="btn btn-success m-2" type="submit">Добавить</button>
-  </div>
-  </div>
-  =======
-  >>>>>>> abcd387c255db47ee02596d32cc36c178fefc4ce
-  {% endblock %}
+{% endblock %}
 
-  {% block js-scripts %}
+{% block js-scripts %}
 
-  <script>
-<<<<<<< HEAD
-    document.getElementById('add-executor-tb').addEventListener('input', function () {
-      const filterValue = this.value.toLowerCase();
-      const formChecks = document.querySelectorAll('.form-check');
+<script>
+  document.getElementById('add-executor-tb').addEventListener('input', function () {
+    const filterValue = this.value.toLowerCase();
+    const formChecks = document.querySelectorAll('.form-check');
 
-      formChecks.forEach(formCheck => {
-        const card = formCheck.querySelector('.executor-card');
-        const name = card.getAttribute('data-name').toLowerCase();
-        if (name.includes(filterValue)) {
-          formCheck.style.display = 'block';
-        } else {
-          formCheck.style.display = 'none';
-        }
-      });
+    formChecks.forEach(formCheck => {
+      const card = formCheck.querySelector('.executor-card');
+      const name = card.getAttribute('data-name').toLowerCase();
+      if (name.includes(filterValue)) {
+        formCheck.style.display = 'block';
+      } else {
+        formCheck.style.display = 'none';
+      }
     });
-    document.querySelectorAll('.executor-card').forEach(card => {
-      card.addEventListener('click', function () {
-        const memberId = this.getAttribute('data-member-id');
-        const memberName = this.getAttribute('data-name');
-        document.getElementById('add-executor-id').value = memberId;
-        document.getElementById('add-executor-tb').value = memberName;
-      });
+  });
+  document.querySelectorAll('.executor-card').forEach(card => {
+    card.addEventListener('click', function () {
+      const memberId = this.getAttribute('data-member-id');
+      const memberName = this.getAttribute('data-name');
+      document.getElementById('add-executor-id').value = memberId;
+      document.getElementById('add-executor-tb').value = memberName;
     });
+  });
 
-=======
-   document.getElementById('add-executor-tb').addEventListener('input', function () {
-      const filterValue = this.value.toLowerCase();
-      const formChecks = document.querySelectorAll('.form-check');
+  document.getElementById('add-executor-tb').addEventListener('input', function () {
+    const filterValue = this.value.toLowerCase();
+    const formChecks = document.querySelectorAll('.form-check');
 
-      formChecks.forEach(formCheck => {
-        const card = formCheck.querySelector('.executor-card');
-        const name = card.getAttribute('data-name').toLowerCase();
-        if (name.includes(filterValue)) {
-          formCheck.style.display = 'block';
-        } else {
-          formCheck.style.display = 'none';
-        }
-      });
+    formChecks.forEach(formCheck => {
+      const card = formCheck.querySelector('.executor-card');
+      const name = card.getAttribute('data-name').toLowerCase();
+      if (name.includes(filterValue)) {
+        formCheck.style.display = 'block';
+      } else {
+        formCheck.style.display = 'none';
+      }
     });
-    document.querySelectorAll('.executor-card').forEach(card => {
-    card.addEventListener('click', function() {
-        const memberId = this.getAttribute('data-member-id');
-        const memberName = this.getAttribute('data-name');
-        document.getElementById('add-executor-id').value = memberId;
-        document.getElementById('add-executor-tb').value = memberName;
-     document.getElementById(`member_${memberId}`).checked = true;
+  });
+  document.querySelectorAll('.executor-card').forEach(card => {
+    card.addEventListener('click', function () {
+      const memberId = this.getAttribute('data-member-id');
+      const memberName = this.getAttribute('data-name');
+      document.getElementById('add-executor-id').value = memberId;
+      document.getElementById('add-executor-tb').value = memberName;
+      document.getElementById(`member_${memberId}`).checked = true;
     });
-});
->>>>>>> abcd387c255db47ee02596d32cc36c178fefc4ce
-    document.getElementById('cancel-btn').addEventListener('click', function () {
-      history.back();
-    });
-  </script>
-  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-  {% endblock %}
+  });
+  document.getElementById('cancel-btn').addEventListener('click', function () {
+    history.back();
+  });
+</script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+{% endblock %}

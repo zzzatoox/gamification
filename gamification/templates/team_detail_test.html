@@ -350,9 +350,9 @@
           <form method="POST" action="">
             {% csrf_token %}
             <div class="mb-3">
-            <input type="hidden" id="task_id_inprogress" value="" name="task_id">
-            <label class="form-label">Название</label>
-            <input type="text" class="form-control" readonly id="task-detail-in-progress-name-tb">
+              <input type="hidden" id="task_id_inprogress" value="" name="task_id">
+              <label class="form-label">Название</label>
+              <input type="text" class="form-control" readonly id="task-detail-in-progress-name-tb">
             </div>
             <div class="mb-3">
               <label class="form-label">Описание</label>
@@ -380,24 +380,24 @@
             {% csrf_token %}
             <div class="mb-3">
               <label class="form-label">Название</label>
-            <input type="hidden" id="task_id_done" value="">
-            <input type="text" class="form-control" readonly id="task-detail-done-name-tb">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Описание</label>
-            <textarea class="form-control" readonly id="task-detail-done-description-tb" rows="3"></textarea>
-            <!-- Если сообщение на проверке, и если его смотрит овнер, то отобразить кнопку "принять" -->
-            <div class="container d-flex justify-content-end">
-              {% if user == team.owner %}
-              <button type="submit" class="btn btn-sm btn-success">Принять</button>
-              {% endif %}
+              <input type="hidden" id="task_id_done" value="">
+              <input type="text" class="form-control" readonly id="task-detail-done-name-tb">
             </div>
-          
+            <div class="mb-3">
+              <label class="form-label">Описание</label>
+              <textarea class="form-control" readonly id="task-detail-done-description-tb" rows="3"></textarea>
+              <!-- Если сообщение на проверке, и если его смотрит овнер, то отобразить кнопку "принять" -->
+              <div class="container d-flex justify-content-end">
+                {% if user == team.owner %}
+                <button type="submit" class="btn btn-sm btn-success">Принять</button>
+                {% endif %}
+              </div>
+
           </form>
-          </div>
         </div>
       </div>
     </div>
+  </div>
   </div>
 
   <!-- ModalWindow AddExecutor -->
@@ -415,36 +415,35 @@
             <input type="hidden" id="appoint-to-task-id" name="task_id" value="">
             <input type="text" class="form-control mb-4" id="add-executor-tb" placeholder="Кого вы хотите назначить?">
             <div class="card-body" style="overflow-y: auto; overflow-x: hidden; max-height: 700px;">
-            <!-- Карточка пользователя -->
-            {% for member, photo_url in members %}
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="member_{{ member.employee.id }}" id="add-executor"
-                checked>
-              <div class="card executor-card mb-1" data-member-id="{{ member.employee.id }}"
-                data-name="{{ member.employee.last_name }} {{ member.employee.first_name }} {{ member.employee.patronymic }}">
-                <div class="card-body">
-                  <a class="card-link" style="text-decoration: none; color: inherit; cursor:pointer"
-                  data-value="{{ member.employee.id }}">
-                    <div class="row align-items-center">
-                      <div class="col-2 m-1">
-                        <img src="{{ photo_url }}" class="card-img-top rounded-circle mx-auto d-block m-1"
-                        style="width: 50px; height: 50px;">
+              <!-- Карточка пользователя -->
+              {% for member, photo_url in members %}
+              <div class="form-check">
+                <input class="form-check-input" type="radio" id="add-executor" checked>
+                <div class="card executor-card mb-1" data-member-id="{{ member.employee.id }}"
+                  data-name="{{ member.employee.last_name }} {{ member.employee.first_name }} {{ member.employee.patronymic }}">
+                  <div class="card-body">
+                    <a class="card-link" style="text-decoration: none; color: inherit; cursor:pointer"
+                      data-value="{{ member.employee.id }}">
+                      <div class="row align-items-center">
+                        <div class="col-2 m-1">
+                          <img src="{{ photo_url }}" class="card-img-top rounded-circle mx-auto d-block m-1"
+                            style="width: 50px; height: 50px;">
+                        </div>
+                        <div class="col-8" style="font-size: 14.5pt;">
+                          <p><span style="font-style: italic;">ФИО: </span>{{ member.employee.last_name }}
+                            {{ member.employee.first_name }} {{ member.employee.patronymic }}</p>
+                          <p><span style="font-style: italic;">Логин: </span>{{ member.employee.username }}</p>
+                        </div>
                       </div>
-                      <div class="col-8" style="font-size: 14.5pt;">
-                        <p><span style="font-style: italic;">ФИО: </span>{{ member.employee.last_name }} {{
-                          member.employee.first_name }} {{ member.employee.patronymic }}</p>
-                        <p><span style="font-style: italic;">Логин: </span>{{ member.employee.username }}</p>
-                      </div>
-                    </div>
-                  </a>
+                    </a>
+                  </div>
                 </div>
               </div>
+              {% endfor %}
             </div>
-            {% endfor %}
-          </div>
-          <div class="d-flex justify-content-end">
-            <button class="btn btn-danger m-2" type="button" id="cancel-btn" href="#">Отменить</button>
-            <button class="btn btn-success m-2" type="submit">Назначить</button>
+            <div class="d-flex justify-content-end">
+              <button class="btn btn-danger m-2" type="button" id="cancel-btn" href="#">Отменить</button>
+              <button class="btn btn-success m-2" type="submit">Назначить</button>
           </form>
         </div>
       </div>

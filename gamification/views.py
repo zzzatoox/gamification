@@ -26,11 +26,12 @@ from .models import (
     UserProfile,
     Status,
     Product,
+    Inventory,
 )
 
-CREATED_STATUS = Status.objects.get_or_create(title="Создана")[0]
-IN_PROGRESS_STATUS = Status.objects.get_or_create(title="В процессе")[0]
-COMPLETED_STATUS = Status.objects.get_or_create(title="Выполнена")[0]
+# CREATED_STATUS = Status.objects.get_or_create(title="Создана")[0]
+# IN_PROGRESS_STATUS = Status.objects.get_or_create(title="В процессе")[0]
+# COMPLETED_STATUS = Status.objects.get_or_create(title="Выполнена")[0]
 
 
 # Create your views here.
@@ -228,8 +229,12 @@ def team_detail_test(request, team_id):
     # получение задач
     tasks = Task.objects.filter(team=team)
 
-    waiting_tasks = tasks.filter(status=CREATED_STATUS)
-    in_progress_tasks = tasks.filter(status=IN_PROGRESS_STATUS)
+    waiting_tasks = tasks.filter(
+        status=Status.objects.get_or_create(title="Создана")[0]
+    )
+    in_progress_tasks = tasks.filter(
+        status=Status.objects.get_or_create(title="В процессе")[0]
+    )
 
     seven_days_ago = timezone.now() - timezone.timedelta(days=7)
     completed_tasks = tasks.filter(
@@ -251,7 +256,7 @@ def team_detail_test(request, team_id):
 
 
 @login_required(login_url="authorization")
-def invite_in_team(request, team_id):  #  (request, team_id)
+def invite_in_team(request, team_id):
     # все пользователи
     team = get_object_or_404(Team, team_id=team_id)
     all_users = User.objects.exclude(is_superuser=True)
@@ -269,6 +274,16 @@ def invite_in_team(request, team_id):  #  (request, team_id)
 
 
 @login_required(login_url="authorization")
+def kick(request, team_id, employee_id):
+    team_employee = get_object_or_404(
+        TeamEmployee, team_id=team_id, employee_id=employee_id
+    )
+    team_employee.delete()
+
+    return redirect("team_detail", team_id=team_id)
+
+
+@login_required(login_url="authorization")
 def shop(request):
     products = Product.objects.all()
     return render(
@@ -279,7 +294,25 @@ def shop(request):
 
 
 @login_required(login_url="authorization")
-def buy_product(request): ...
+def buy_product(request, product_id):
+    try:
+        product = get_object_or_404(Product, product_id=product_id)
+        user_profile = get_object_or_404(UserProfile, user=request.user)
+
+        with transaction.atomic():
+            if user_profile.coins >= product.price:
+                user_profile.coins -= product.price
+                user_profile.save()
+            else:
+                messages.error(request, "У вас недостаточно монет")
+                return redirect("shop")
+
+            Inventory.objects.create(user=request.user, product=product)
+            messages.success(request, "Товар успешно куплен")
+            return redirect("shop")
+    except Exception as e:
+        messages.error(request, "Не удалось приобрести товар")
+        return redirect("shop")
 
 
 def get_user_photo_url(user):
@@ -314,11 +347,22 @@ def profile(request, user_id):
 
     if is_user_owner:
         tasks = TaskEmployee.objects.filter(
-            employee=user_info, status=IN_PROGRESS_STATUS
+            employee=user_info,
+            status=Status.objects.get_or_create(title="В процессе")[0],
         )
         context["tasks"] = tasks
 
     return render(request, "profile.html", context)
+
+
+@login_required
+def inventory(request):
+    try:
+        inventory = Inventory.objects.get(user=request.user)
+        return render(request, "inventory.html", inventory)
+    except Exception as e:
+        messages.error(request, "Ошибка при получении инвентаря")
+        return redirect("profile", user_id=request.user.id)
 
 
 @login_required
@@ -339,7 +383,7 @@ def create_task(request):
                 team=team,
                 xp_reward=xp,  # TODO: подставить реальное значение
                 coins_reward=coins,  # TODO: подставить реальное значение
-                status=CREATED_STATUS,
+                status=Status.objects.get_or_create(title="Создана")[0],
             )
 
             return JsonResponse({"success": True})
@@ -388,10 +432,10 @@ def assign_task(request):
             )
             task = task_employee.task
 
-            task_employee.status = IN_PROGRESS_STATUS
+            task_employee.status = Status.objects.get_or_create(title="В процессе")[0]
             task_employee.save()
 
-            task.status = IN_PROGRESS_STATUS
+            task.status = Status.objects.get_or_create(title="В процессе")[0]
             task.save()
 
             messages.success(request, "Задача успешно назначена.")
@@ -410,12 +454,14 @@ def complete_task(request):
             task_employee = get_object_or_404(TaskEmployee, task_id=task_id)
             task = task_employee.task
 
+            completed_status = Status.objects.get_or_create(title="Выполнена")[0]
+
             # изменяю статус задачи и связи
-            task_employee.status = COMPLETED_STATUS
+            task_employee.status = completed_status
             task_employee.completed_at = timezone.now()
             task_employee.save()
 
-            task.status = COMPLETED_STATUS
+            task.status = completed_status
             task.save()
 
             # получаю объект профиля пользователя
@@ -430,6 +476,18 @@ def complete_task(request):
     return redirect("team_detail", team_id=task.team.team_id)
 
 
+@login_required
+def delete_task(request, task_id):
+    try:
+        task = get_object_or_404(Task, task_id=task_id)
+        task.delete()
+        messages.success(request, "Задача успешно удалена.")
+        return redirect("team_detail", team_id=task.team.team_id)
+    except Exception as e:
+        messages.error(request, "Произошла ошибка при удалении задачи")
+        return redirect("team_detail", team_id=task.team.team_id)
+
+
 # ИИ
 
 
@@ -440,7 +498,8 @@ def get_token():
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
         "Accept": "application/json",
-        "RqUID": "5dd2073a-f60f-4221-9063-c4c3daae50d0",
+        # "RqUID": "5dd2073a-f60f-4221-9063-c4c3daae50d0",
+        "RqUID": "6a7a585f-6dac-489c-82fc-fdc37e6e1195",
         "Authorization": "Basic NTRiOThmOTctMGQxZS00YTZhLTljZDQtZDcwZThiMWE5MTc4OmE1NmQ3ZGIxLTA4YWEtNGM1Yi1iMjdhLTBjOWVjMDVkYjk0Mg==",
     }
 
@@ -487,8 +546,13 @@ def get_answer(task_text, giga_token):
         response = requests.request(
             "POST", url, headers=headers, data=payload, verify=False
         )
-        result = response.json()["choices"][0]["message"]["content"]
-        return result
+        response_json = response.json()
+        if "choices" in response_json:
+            result = response_json["choices"][0]["message"]["content"]
+            return result
+        else:
+            print("Ответ от API не содержит ключа 'choices'")
+            return None
     except requests.RequestException as e:
         print(f"Произошла ошибка: {str(e)}")
         return None

@@ -44,9 +44,11 @@
                         <div class="text-center">
                             <!-- подумать как это обыграть -->
                             {% if product.is_available %}
-                            <a class="btn btn-outline-dark mt-auto" href="#">Приобрести</a>
+                            <a class="btn btn-outline-dark mt-auto"
+                                href="{% url 'buy_product' product.product_id %}">Приобрести</a>
                             {% else %}
                             <!-- нет в наличии/не продается -->
+                            <h1>Товара нет в наличии</h1>
                             {% endif %}
                         </div>
                     </div>
@@ -95,31 +97,6 @@
             modalImage.src = photo;
         });
     });
-
-    // кнопка купить
-    // Check if button pressed
-    $(document).on('click', '#add-cart', function (e) {
-        e.preventDefault();
-        $.ajax({
-            type: 'POST',
-            url: "{% url 'buy_product' %}",
-            data: {
-                product_id: $('#add-cart').val(),
-                product_qty: $('#inputQuantity').val(),
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                action: 'post'
-            },
-
-            success: function (json) {
-                // console.log(json)
-                document.getElementById("cart_quantity").textContent = json.qty
-            },
-
-            error: function (xhr, errmsg, err) {
-
-            }
-        });
-    })
 </script>
 
 {% endblock %}

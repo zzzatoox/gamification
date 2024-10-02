@@ -118,7 +118,9 @@
                       </div>
                       {% if user == team.owner and member.employee != team.owner %}
                       <div class="col-1">
-                        <button class="btn btn-sm btn-outline-dark">Х</button>
+                        <a href="{% url 'kick' team_id=team.team_id employee_id=member.employee.id %}">
+                          <button class="btn btn-sm btn-outline-dark">Х</button>
+                        </a>
                       </div>
                       {% endif %}
                     </div>
@@ -161,16 +163,14 @@
                 <div class="scrum-card-body">
                   {% if user == team.owner %}
                   <div class="col d-flex justify-content-end">
-                    <form method="post" action="{% url 'delete_task' %}" class="delete-task-form">
-                      {% csrf_token %}
-                      <input type="hidden" name="task_id" value="{{ task.task_id }}">
+                    <a href="{% url 'delete_task' task.task_id %}">
                       <button type="submit" class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
-                    </form>
+                    </a>
                   </div>
                   {% endif %}
                   <div class="scrum-card">
                     <div class="row">
-                      <input type="hidden" value="{{ task.task_id }}" class="hidden-task-id">
+                      <input type="hidden" value="{{task.task_id}}" class="hidden-task-id">
                       <div class="col-10">
                         <h5>{{ task.title }}</h5>
                       </div>
@@ -182,70 +182,73 @@
                 </div>
                 {% endfor %}
               </div>
-            </div>
-            <!-- В процессе -->
-            <div class="scrum-column scrum-column-inprogress">
-              <h2 class="text-center">В процессе</h2>
-              {% for task in in_progress_tasks %}
-              <div class="scrum-card-body">
-                {% if user == team.owner %}
-                <div class="col d-flex justify-content-end">
-                  <button class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
-                </div>
-                {% endif %}
-                <div class="scrum-card">
-                  <div class="row">
-                    <input type="hidden" value="{{task.task_id}}" class="hidden-task-id">
-                    <input type="hidden" value="{{task.xp_reward}}" class="hidden-task-xp">
-                    <input type="hidden" value="{{task.coins_reward}}" class="hidden-task-coins">
-                    <div class="col-10">
-                      <h5>{{ task.title }}</h5>
-                      {% with assignment=task.assignments.first %}
-                      <h7 style="font-style: italic;">В работе у {{assignment.employee.username}}</h7>
-                      {% endwith %}
-                    </div>
-                    <div class="row"></div>
-                    <p>{{ task.description }}</p>
+              <!-- В процессе -->
+              <div class="scrum-column scrum-column-inprogress">
+                <h2 class="text-center">В процессе</h2>
+                {% for task in in_progress_tasks %}
+                <div class="scrum-card-body">
+                  {% if user == team.owner %}
+                  <div class="col d-flex justify-content-end">
+                    <a href="{% url 'delete_task' task.task_id %}">
+                      <button type="submit" class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                    </a>
                   </div>
-                </div>
-              </div>
-              {% endfor %}
-            </div>
-            <!-- Выполнено -->
-            <div class="scrum-column scrum-column-done">
-              <h2 class="text-center">Выполнено</h2>
-              {% for task in completed_tasks %}
-              <div class="scrum-card-body">
-                {% if user == team.owner %}
-                <div class="col d-flex justify-content-end">
-                  <button class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
-                </div>
-                {% endif %}
-                <div class="scrum-card">
-                  <div class="row">
-                    <div class="col-10">
+                  {% endif %}
+                  <div class="scrum-card">
+                    <div class="row">
                       <input type="hidden" value="{{task.task_id}}" class="hidden-task-id">
                       <input type="hidden" value="{{task.xp_reward}}" class="hidden-task-xp">
                       <input type="hidden" value="{{task.coins_reward}}" class="hidden-task-coins">
-                      <h5>{{ task.title }}</h5>
-                      {% if task.status.title == "На проверке" %}
-                      <p style="font-style: italic;">На проверке</p>
-                      {% else %}
-                      <p style="font-style: italic;">Выполнена</p>
-                      {% endif %}
-                      <!-- ^^^^ -->
+                      <div class="col-10">
+                        <h5>{{ task.title }}</h5>
+                        {% with assignment=task.assignments.first %}
+                        <h7 style="font-style: italic;">В работе у {{assignment.employee.username}}</h7>
+                        {% endwith %}
+                      </div>
+                      <div class="row"></div>
+                      <p>{{ task.description }}</p>
                     </div>
-                    <div class="row"></div>
-                    <p>{{ task.description }}</p>
                   </div>
                 </div>
+                {% endfor %}
               </div>
-              {% endfor %}
+              <!-- Выполнено -->
+              <div class="scrum-column scrum-column-done">
+                <h2 class="text-center">Выполнено</h2>
+                {% for task in completed_tasks %}
+                <div class="scrum-card-body">
+                  {% if user == team.owner %}
+                  <div class="col d-flex justify-content-end">
+                    <a href="{% url 'delete_task' task.task_id %}">
+                      <button type="submit" class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                    </a>
+                  </div>
+                  {% endif %}
+                  <div class="scrum-card">
+                    <div class="row">
+                      <div class="col-10">
+                        <input type="hidden" value="{{task.task_id}}" class="hidden-task-id">
+                        <input type="hidden" value="{{task.xp_reward}}" class="hidden-task-xp">
+                        <input type="hidden" value="{{task.coins_reward}}" class="hidden-task-coins">
+                        <h5>{{ task.title }}</h5>
+                        {% if task.status.title == "На проверке" %}
+                        <p style="font-style: italic;">На проверке</p>
+                        {% else %}
+                        <p style="font-style: italic;">Выполнена</p>
+                        {% endif %}
+                        <!-- ^^^^ -->
+                      </div>
+                      <div class="row"></div>
+                      <p>{{ task.description }}</p>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
     </div>
   </section>
@@ -263,7 +266,7 @@
             {% csrf_token %}
             <div class="mb-3">
               <label class="col-form-label">Название:</label>
-              <input type="text" maxlength="30" class="form-control" id="recipient-name" name="title">
+              <input type="text" required maxlength="30" class="form-control" id="recipient-name" name="title">
             </div>
             <div class="mb-3">
               <label for="message-text" class="col-form-label">Описание</label>
@@ -445,7 +448,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Назначение участника на решение задачи</h5>
+          <h5 class="modal-title">Назначение сотрудника на решение задачи</h5>
         </div>
         <div class="modal-body">
           <!-- ФОРМА "НАЗНАЧИТЬ ЗАДАЧУ НА кого-то " -->
@@ -698,33 +701,6 @@
       });
     });
 
-  </script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-  <!-- Удаление карточки -->
-  <script>
-    $(document).ready(function () {
-      $('.delete-task-form').on('submit', function (event) {
-        event.preventDefault();
-
-        var form = $(this);
-        var url = form.attr('action');
-        var method = form.attr('method');
-        var data = form.serialize();
-
-        $.ajax({
-          url: url,
-          type: method,
-          data: data,
-          success: function (response) {
-            form.closest('.scrum-card-body').remove();
-          },
-          error: function (xhr, status, error) {
-            alert('Произошла ошибка при удалении задачи: ' + error);
-          }
-        });
-      });
-    });
   </script>
 
 </body>

@@ -393,16 +393,14 @@ class Product(models.Model):
 
 
 class Inventory(models.Model):
-    inventory_id = models.AutoField(primary_key=True, verbose_name="ID инвентаря")
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name="Пользователь"
     )
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Товар")
-    quantity = models.PositiveIntegerField(default=1, verbose_name="Количество")
     date_added = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
 
     def __str__(self):
-        return f"{self.user.username} - {self.product.title} ({self.quantity})"
+        return f"{self.user.username} - {self.product.title}"
 
     class Meta:
         verbose_name = "Инвентарь"

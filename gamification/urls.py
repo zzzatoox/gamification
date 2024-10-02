@@ -19,11 +19,14 @@ urlpatterns = [
     path("assign_task/", views.assign_task, name="assign_task"),
     path("complete_task/", views.complete_task, name="complete_task"),
     path("profile/<int:user_id>", views.profile, name="profile"),
+    path("inventory/", views.inventory, name="inventory"),
     path("ratings_teams/", views.ratings_teams, name="ratings_teams"),
     path("ratings_users/", views.ratings_users, name="ratings_users"),
-    path("invite/<int:team_id>", views.invite_in_team, name="invite"),  # <int:team_id>
+    path("invite/<int:team_id>/", views.invite_in_team, name="invite"),  # <int:team_id>
+    path("kick/<int:team_id>/<int:employee_id>/", views.kick, name="kick"),
     path("shop/", views.shop, name="shop"),
-    path("buy_product/", views.buy_product, name="buy_product"),
+    path("buy_product/<int:product_id>/", views.buy_product, name="buy_product"),
+    path("delete_task/<int:task_id>/", views.delete_task, name="delete_task"),
     path("calculate_reward/", views.calculate_reward, name="calculate_reward"),
 ]
 

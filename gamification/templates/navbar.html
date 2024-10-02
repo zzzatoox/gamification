@@ -5,16 +5,23 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary" style="font-size: 16pt;">
     <div class="container-fluid">
+        {% if not user.is_authenticated %}
         <a class="navbar-brand mx-5" style="font-size: 30pt; font-family: Pirata One, cursive;" href="/">SWORD</a>
+        {% else %}
+        <a class="navbar-brand mx-5" style="font-size: 30pt; font-family: Pirata One, cursive;"
+            href="{% url 'teams' %}">SWORD</a>
+        {% endif %}
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto my-lg-0">
+                {% if not user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Главная</a>
                 </li>
+                {% endif %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" id="navbarDropdown" role="button"
                         data-bs-toggle="dropdown" aria-expanded="false">

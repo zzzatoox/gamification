@@ -118,7 +118,9 @@
                       </div>
                       {% if user == team.owner and member.employee != team.owner %}
                       <div class="col-1">
-                        <button class="btn btn-sm btn-outline-dark">Х</button>
+                        <a href="{% url 'kick' team_id=team.team_id employee_id=member.employee.id %}">
+                          <button class="btn btn-sm btn-outline-dark">Х</button>
+                        </a>
                       </div>
                       {% endif %}
                     </div>
@@ -161,8 +163,9 @@
                 <div class="scrum-card-body">
                   {% if user == team.owner %}
                   <div class="col d-flex justify-content-end">
-                    <input type="hidden" class="hidden-task_id">
-                    <button class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                    <a href="{% url 'delete_task' task.task_id %}">
+                      <button type="submit" class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                    </a>
                   </div>
                   {% endif %}
                   <div class="scrum-card">
@@ -188,7 +191,9 @@
                 <div class="scrum-card-body">
                   {% if user == team.owner %}
                   <div class="col d-flex justify-content-end">
-                    <button type="submit" class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                    <a href="{% url 'delete_task' task.task_id %}">
+                      <button type="submit" class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                    </a>
                   </div>
                   {% endif %}
                   <div class="scrum-card">
@@ -216,7 +221,9 @@
                 <div class="scrum-card-body">
                   {% if user == team.owner %}
                   <div class="col d-flex justify-content-end">
-                    <button type="submit" class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                    <a href="{% url 'delete_task' task.task_id %}">
+                      <button type="submit" class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                    </a>
                   </div>
                   {% endif %}
                   <div class="scrum-card">
@@ -249,44 +256,44 @@
   </section>
 
   <!-- Modal-window CreateTasks -->
-<div class="modal fade" id="CreateTaskModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Создание задачи</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="createTaskForm" method="post" action="{% url 'create_task' %}">
-          {% csrf_token %}
-          <div class="mb-3">
-            <label class="col-form-label">Название:</label>
-            <input type="text" maxlength="30" required class="form-control" id="recipient-name" name="title">
-          </div>
-          <div class="mb-3">
-            <label for="message-text" class="col-form-label">Описание</label>
-            <textarea class="form-control" id="message-text" name="description"></textarea>
-          </div>
-          <div class="mb-3 d-flex justify-content-start" id="xp_coins_result">
-            <label class="col-form-label mx-3">XP:</label>
-            <input type="text" maxlength="30" readonly class="form-control" id="xp_tb">
-            <label class="col-form-label mx-3">Монеты:</label>
-            <input type="text" maxlength="30" readonly class="form-control" id="coins_tb">
-          </div>
-          <div class="d-flex justify-content-end my-3">
-            <button type='button' id="get_xp_coins_btn" class="btn btn-primary">Рассчитать стоимость задачи</button>
-          </div>
-          <input type="hidden" id="executor_id" name="executor">
-          <input type="hidden" name="team_id" value="{{ team.team_id }}">
-          <div class="container d-flex justify-content-end">
-            <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
-            <button type="submit" class="btn btn-success m-1" id="create-task-id" disabled>Создать</button>
-          </div>
-        </form>
+  <div class="modal fade" id="CreateTaskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Создание задачи</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="createTaskForm" method="post" action="{% url 'create_task' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="col-form-label">Название:</label>
+              <input type="text" maxlength="30" required class="form-control" id="recipient-name" name="title">
+            </div>
+            <div class="mb-3">
+              <label for="message-text" class="col-form-label">Описание</label>
+              <textarea class="form-control" id="message-text" name="description"></textarea>
+            </div>
+            <div class="mb-3 d-flex justify-content-start" id="xp_coins_result">
+              <label class="col-form-label mx-3">XP:</label>
+              <input type="text" maxlength="30" readonly class="form-control" id="xp_tb">
+              <label class="col-form-label mx-3">Монеты:</label>
+              <input type="text" maxlength="30" readonly class="form-control" id="coins_tb">
+            </div>
+            <div class="d-flex justify-content-end my-3">
+              <button type='button' id="get_xp_coins_btn" class="btn btn-primary">Рассчитать стоимость задачи</button>
+            </div>
+            <input type="hidden" id="executor_id" name="executor">
+            <input type="hidden" name="team_id" value="{{ team.team_id }}">
+            <div class="container d-flex justify-content-end">
+              <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
+              <button type="submit" class="btn btn-success m-1" id="create-task-id" disabled>Создать</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
   <!-- Modal-window EditTeamProfile -->
   <div class="modal fade" id="EditTeamProfile" tabindex="-1" aria-hidden="true">
@@ -439,7 +446,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Назначение участника на решение задачи</h5>
+          <h5 class="modal-title">Назначение сотрудника на решение задачи</h5>
         </div>
         <div class="modal-body">
           <!-- ФОРМА "НАЗНАЧИТЬ ЗАДАЧУ НА кого-то " -->
@@ -554,8 +561,8 @@
         document.getElementById('recipient-name').value = '';
         document.getElementById('message-text').value = '';
         document.getElementById('executor_id').value = '';
-        document.getElementById('xp_tb').value='';
-        document.getElementById('coins_tb').value='';
+        document.getElementById('xp_tb').value = '';
+        document.getElementById('coins_tb').value = '';
       }
     });
 
@@ -695,6 +702,7 @@
     });
 
   </script>
+  <<<<<<< HEAD=======>>>>>>> 1f7f47f57fff6d6af0d6b1f32e7fac14fae8f26a
 </body>
 
 {% endblock %}

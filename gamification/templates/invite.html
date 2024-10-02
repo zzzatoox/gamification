@@ -7,75 +7,110 @@
 {% endblock %}
 
 {% block body %}
-
 <div class="container my-3">
   <div class="text-center">
-    <h1>Добавить в команду {{team.title}}</h1>
+    <h1>Приглашение в команду {{team.title}}</h1>
   </div>
-  <input type="text" class="form-control mb-4" id="add-executor-tb" placeholder="Кого вы хотите добавить?">
-  <div class="card-body p-3" style="overflow-y: auto; overflow-x: hidden; max-height: 700px;">
-    <!-- Карточка пользователя -->
-    {% for member, photo_url in all_users_with_photos %}
-    <div class="form-check">
-      <input class="form-check-input" type="radio" name="flexRadioDefault" id="member_{{ member.id }}" checked>
-      <div class="card executor-card mb-1" data-member-id="{{ member.id }}"
-        data-name="{{ member.last_name }} {{ member.first_name }} {{ member.patronymic }}">
-        <div class="card-body">
-          <a class="card-link" style="text-decoration: none; color: inherit; cursor:pointer"
-            data-value="{{ member.employee.id }}">
-            <div class="row align-items-center">
-              <div class="col-2 m-1">
-                <img src="{{ photo_url }}" class="card-img-top rounded-circle mx-auto d-block m-1"
-                  style="width: 50px; height: 50px;">
+  <form method="POST" action="">
+    <input type="text" class="form-control mb-4" id="add-executor-tb" placeholder="Кого вы хотите добавить?">
+    <input type="hidden" id="add-executor-id" name="selected_member_id">
+    <div class="card-body p-3" style="overflow-y: auto; overflow-x: hidden; max-height: 700px;">
+      <!-- Карточка пользователя -->
+      {% for member, photo_url in all_users_with_photos %}
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="flexRadioDefault" id="member_{{ member.id }}" checked>
+        <div class="card executor-card mb-1" data-member-id="{{ member.id }}"
+          data-name="{{ member.last_name }} {{ member.first_name }} {{ member.patronymic }}">
+          <div class="card-body">
+            <a class="card-link" style="text-decoration: none; color: inherit; cursor:pointer"
+              data-value="{{ member.employee.id }}">
+              <div class="row align-items-center">
+                <div class="col-2 m-1">
+                  <img src="{{ photo_url }}" class="card-img-top rounded-circle mx-auto d-block m-1"
+                    style="width: 50px; height: 50px;">
+                </div>
+                <div class="col-8" style="font-size: 14.5pt;">
+                  <p><span style="font-style: italic;">ФИО: </span>{{ member.last_name }} {{ member.first_name }}
+                    {{member.patronymic }}</p>
+                  <p><span style="font-style: italic;">Логин: </span>{{ member.username }}</p>
+                </div>
               </div>
-              <div class="col-8" style="font-size: 14.5pt;">
-                <p><span style="font-style: italic;">ФИО: </span>{{ member.last_name }} {{ member.first_name }}
-                  {{member.patronymic }}</p>
-                <p><span style="font-style: italic;">Логин: </span>{{ member.username }}</p>
-              </div>
-            </div>
-          </a>
+            </a>
+          </div>
         </div>
       </div>
+      {% endfor %}
     </div>
-    {% endfor %}
-  </div>
-  <div class="d-flex justify-content-end">
-    <button class="btn btn-danger m-2" id="cancel-btn" href="#">Отменить</button>
-    <button class="btn btn-success m-2" type="submit">Добавить</button>
-  </div>
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-danger m-2" type="button" id="cancel-btn" href="/">Отменить</button>
+      <button class="btn btn-success m-2" type="submit">Добавить</button>
+  </form>
 </div>
-{% endblock %}
+</div>
+<<<<<<< HEAD <div class="d-flex justify-content-end">
+  <button class="btn btn-danger m-2" id="cancel-btn" href="#">Отменить</button>
+  <button class="btn btn-success m-2" type="submit">Добавить</button>
+  </div>
+  </div>
+  =======
+  >>>>>>> abcd387c255db47ee02596d32cc36c178fefc4ce
+  {% endblock %}
 
-{% block js-scripts %}
+  {% block js-scripts %}
 
-<script>
-  document.getElementById('add-executor-tb').addEventListener('input', function () {
-    const filterValue = this.value.toLowerCase();
-    const formChecks = document.querySelectorAll('.form-check');
+  <script>
+<<<<<<< HEAD
+    document.getElementById('add-executor-tb').addEventListener('input', function () {
+      const filterValue = this.value.toLowerCase();
+      const formChecks = document.querySelectorAll('.form-check');
 
-    formChecks.forEach(formCheck => {
-      const card = formCheck.querySelector('.executor-card');
-      const name = card.getAttribute('data-name').toLowerCase();
-      if (name.includes(filterValue)) {
-        formCheck.style.display = 'block';
-      } else {
-        formCheck.style.display = 'none';
-      }
+      formChecks.forEach(formCheck => {
+        const card = formCheck.querySelector('.executor-card');
+        const name = card.getAttribute('data-name').toLowerCase();
+        if (name.includes(filterValue)) {
+          formCheck.style.display = 'block';
+        } else {
+          formCheck.style.display = 'none';
+        }
+      });
     });
-  });
-  document.querySelectorAll('.executor-card').forEach(card => {
-    card.addEventListener('click', function () {
-      const memberId = this.getAttribute('data-member-id');
-      const memberName = this.getAttribute('data-name');
-      document.getElementById('add-executor-id').value = memberId;
-      document.getElementById('add-executor-tb').value = memberName;
+    document.querySelectorAll('.executor-card').forEach(card => {
+      card.addEventListener('click', function () {
+        const memberId = this.getAttribute('data-member-id');
+        const memberName = this.getAttribute('data-name');
+        document.getElementById('add-executor-id').value = memberId;
+        document.getElementById('add-executor-tb').value = memberName;
+      });
     });
-  });
 
-  document.getElementById('cancel-btn').addEventListener('click', function () {
-    history.back();
-  });
-</script>
-<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-{% endblock %}
+=======
+   document.getElementById('add-executor-tb').addEventListener('input', function () {
+      const filterValue = this.value.toLowerCase();
+      const formChecks = document.querySelectorAll('.form-check');
+
+      formChecks.forEach(formCheck => {
+        const card = formCheck.querySelector('.executor-card');
+        const name = card.getAttribute('data-name').toLowerCase();
+        if (name.includes(filterValue)) {
+          formCheck.style.display = 'block';
+        } else {
+          formCheck.style.display = 'none';
+        }
+      });
+    });
+    document.querySelectorAll('.executor-card').forEach(card => {
+    card.addEventListener('click', function() {
+        const memberId = this.getAttribute('data-member-id');
+        const memberName = this.getAttribute('data-name');
+        document.getElementById('add-executor-id').value = memberId;
+        document.getElementById('add-executor-tb').value = memberName;
+     document.getElementById(`member_${memberId}`).checked = true;
+    });
+});
+>>>>>>> abcd387c255db47ee02596d32cc36c178fefc4ce
+    document.getElementById('cancel-btn').addEventListener('click', function () {
+      history.back();
+    });
+  </script>
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  {% endblock %}

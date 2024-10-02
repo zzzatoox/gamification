@@ -161,16 +161,15 @@
                 <div class="scrum-card-body">
                   {% if user == team.owner %}
                   <div class="col d-flex justify-content-end">
-                    <form method="post" action="{% url 'delete_task' %}" class="delete-task-form">
-                      {% csrf_token %}
-                      <input type="hidden" name="task_id" value="{{ task.task_id }}">
-                      <button type="submit" class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
-                    </form>
+                    <input type="hidden" class="hidden-task_id">
+                    <button class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
                   </div>
                   {% endif %}
                   <div class="scrum-card">
                     <div class="row">
-                      <input type="hidden" value="{{ task.task_id }}" class="hidden-task-id">
+                      <input type="hidden" value="{{task.task_id}}" class="hidden-task-id">
+                      <input type="hidden" value="{{task.xp_reward}}" class="hidden-task-xp">
+                      <input type="hidden" value="{{task.coins_reward}}" class="hidden-task-coins">
                       <div class="col-10">
                         <h5>{{ task.title }}</h5>
                       </div>
@@ -182,7 +181,6 @@
                 </div>
                 {% endfor %}
               </div>
-            </div>
               <!-- В процессе -->
               <div class="scrum-column scrum-column-inprogress">
                 <h2 class="text-center">В процессе</h2>
@@ -190,7 +188,7 @@
                 <div class="scrum-card-body">
                   {% if user == team.owner %}
                   <div class="col d-flex justify-content-end">
-                    <button class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                    <button type="submit" class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
                   </div>
                   {% endif %}
                   <div class="scrum-card">
@@ -218,15 +216,15 @@
                 <div class="scrum-card-body">
                   {% if user == team.owner %}
                   <div class="col d-flex justify-content-end">
-                    <button class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                    <button type="submit" class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
                   </div>
                   {% endif %}
                   <div class="scrum-card">
                     <div class="row">
                       <div class="col-10">
                         <input type="hidden" value="{{task.task_id}}" class="hidden-task-id">
-                      <input type="hidden" value="{{task.xp_reward}}" class="hidden-task-xp">
-                      <input type="hidden" value="{{task.coins_reward}}" class="hidden-task-coins">
+                        <input type="hidden" value="{{task.xp_reward}}" class="hidden-task-xp">
+                        <input type="hidden" value="{{task.coins_reward}}" class="hidden-task-coins">
                         <h5>{{ task.title }}</h5>
                         {% if task.status.title == "На проверке" %}
                         <p style="font-style: italic;">На проверке</p>
@@ -263,7 +261,7 @@
           {% csrf_token %}
           <div class="mb-3">
             <label class="col-form-label">Название:</label>
-            <input type="text" maxlength="30" class="form-control" id="recipient-name" name="title">
+            <input type="text" maxlength="30" required class="form-control" id="recipient-name" name="title">
           </div>
           <div class="mb-3">
             <label for="message-text" class="col-form-label">Описание</label>
@@ -555,6 +553,8 @@
         document.getElementById('recipient-name').value = '';
         document.getElementById('message-text').value = '';
         document.getElementById('executor_id').value = '';
+        document.getElementById('xp_tb').value='';
+        document.getElementById('coins_tb').value='';
       }
     });
 
@@ -694,34 +694,6 @@
     });
     
   </script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  
-  <!-- Удаление карточки -->
-  <script>
-  $(document).ready(function() {
-    $('.delete-task-form').on('submit', function(event) {
-      event.preventDefault();
-  
-      var form = $(this);
-      var url = form.attr('action');
-      var method = form.attr('method');
-      var data = form.serialize();
-  
-      $.ajax({
-        url: url,
-        type: method,
-        data: data,
-        success: function(response) {
-          form.closest('.scrum-card-body').remove();
-        },
-        error: function(xhr, status, error) {
-          alert('Произошла ошибка при удалении задачи: ' + error);
-        }
-      });
-    });
-  });
-  </script>
-
 </body>
 
 {% endblock %}

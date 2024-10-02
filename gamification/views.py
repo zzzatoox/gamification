@@ -343,8 +343,9 @@ def create_task(request):
 
 
 @login_required
-def take_task(request, task_id):
+def take_task(request):
     if request.method == "POST":
+        task_id = request.POST.get("task_id")
         task = get_object_or_404(Task, task_id=task_id)
         user = request.user
 
@@ -364,8 +365,10 @@ def take_task(request, task_id):
             task.status = Status.objects.get(title="В процессе")
             task.save()
 
-            return JsonResponse({"success": True, "message": "Задача успешно взята."})
-    return JsonResponse({"success": False, "error": "Invalid request method"})
+            messages.success(request, "Задача успешно взята.")
+            return redirect("team_detail", team_id=task.team.team_id)
+    messages.error(request, "Произошла ошибка при взятии задачи.")
+    return redirect("team_detail", team_id=task.team.team_id)
 
 
 @login_required

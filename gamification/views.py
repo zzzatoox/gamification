@@ -256,10 +256,10 @@ def team_detail_test(request, team_id):
 
 
 @login_required(login_url="authorization")
-def invite_in_team(request, team_id):
+def invite_list(request, team_id):
     # все пользователи
     team = get_object_or_404(Team, team_id=team_id)
-    all_users = User.objects.exclude(is_superuser=True)
+    all_users = User.objects.exclude(is_superuser=True).exclude(id=request.user.id)
     all_users_photos = [get_user_photo_url(user) for user in all_users]
     all_users_with_photos = list(zip(all_users, all_users_photos))
 
@@ -271,6 +271,24 @@ def invite_in_team(request, team_id):
             "all_users_with_photos": all_users_with_photos,
         },
     )
+
+
+@login_required(login_url="authorization")
+def invite_in_team(request):
+    if request.method == "POST":
+        with transaction.atomic():
+            # все пользователи
+            team_id = request.POST.get("team_id")
+            employee_id = request.POST.get("selected_member_id")
+
+            team = get_object_or_404(Team, team_id=team_id)
+            employee = get_object_or_404(User, id=employee_id)
+            TeamEmployee.objects.create(team=team, employee=employee)
+
+        messages.success(request, "Пользователь успешно добавлен в команду")
+        return redirect("team_detail", team_id=team_id)
+    messages.error(request, "Ошибка при добавлении пользователя в команду")
+    return redirect("team_detail", team_id=team_id)
 
 
 @login_required(login_url="authorization")
@@ -356,12 +374,24 @@ def profile(request, user_id):
 
 
 @login_required
+def edit_profile(request):
+    if request.method == "POST":
+        if "photo" in request.FILES:
+            request.user.photo = request.FILES["photo"]
+        request.user.save()
+        messages.success(request, "Профиль успешно изменен")
+        return redirect("profile", user_id=request.user.id)
+    messages.error(request, "Ошибка при изменении профиля")
+    return redirect("profile", user_id=request.user.id)
+
+
+@login_required
 def inventory(request):
     try:
-        inventory = Inventory.objects.get(user=request.user)
-        return render(request, "inventory.html", inventory)
+        inventory = Inventory.objects.filter(user=request.user)
+        return render(request, "inventory.html", {"inventory": inventory})
     except Exception as e:
-        messages.error(request, "Ошибка при получении инвентаря")
+        messages.error(request, f"Ошибка при получении инвентаря {str(e)}")
         return redirect("profile", user_id=request.user.id)
 
 

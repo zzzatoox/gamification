@@ -287,17 +287,6 @@ class AchievementEmployee(models.Model):
         verbose_name_plural = "Полученные достижения"
 
 
-# @receiver(post_save, sender=AchievementEmployee)
-# def update_user_profile_on_achievement(sender, instance, **kwargs):
-#     user_profile = instance.employee.userprofile
-#     achievement = instance.achievement
-#     user_profile.xp += achievement.xp_reward
-#     if achievement.coins_reward:
-#         user_profile.coins += achievement.coins_reward
-#     user_profile.update_rank()
-#     user_profile.save()
-
-
 class TaskEmployee(models.Model):
     task = models.ForeignKey(
         Task,
@@ -502,3 +491,33 @@ class UserProfile(models.Model):
         # Обновляем ранг и уровень
         self.update_rank()
         self.save()
+
+    def get_progress(self):
+        # Получаем текущий ранг пользователя
+        current_rank = self.rank
+        if not current_rank:
+            return 0
+
+        # Получаем следующий ранг
+        next_rank = (
+            Rank.objects.filter(level__gt=current_rank.level).order_by("level").first()
+        )
+        if not next_rank:
+            return 100  # Если это последний ранг, прогресс 100%
+
+        # Вычисляем прогресс
+        current_xp = self.xp
+        required_xp = next_rank.required_xp
+        progress = (
+            (current_xp - current_rank.required_xp)
+            / (required_xp - current_rank.required_xp)
+            * 100
+        )
+        return int(progress)
+
+    def get_next_level_required_xp(self):
+        # Получаем следующий ранг
+        next_rank = Rank.objects.filter(level__gt=self.level).order_by("level").first()
+        if not next_rank:
+            return None  # Если это последний ранг, нет требуемого опыта
+        return next_rank.required_xp

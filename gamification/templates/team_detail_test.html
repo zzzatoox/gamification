@@ -1,0 +1,711 @@
+{% extends 'main_template.html' %}
+{% load static %}
+
+{% block head %}
+<title>Профиль команды {{ team.title }}</title>
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+  .scrum-board {
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .scrum-column {
+    flex: 1;
+    margin: 0 10px 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 15px;
+  }
+
+  .scrum-card-body {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .scrum-card {
+    cursor: pointer;
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<body>
+  <section>
+    <div class="container py-5">
+      <div class="row">
+        <div class="col-lg-4">
+          <!-- Блок с профилем команды -->
+          <div class="card mb-4">
+            <div class="card-body text-center">
+              <span class="border">
+                <img src="{{ team_photo_url }}" alt="{{ team.title }} photo" class="img-fluid"
+                  style="width: 150px; height: 165px;">
+              </span>
+              <h5 class="my-3">{{ team.title }}</h5>
+              {% if user == team.owner %}
+              <button class="btn btn-outline-dark" data-bs-toggle="modal"
+                data-bs-target="#EditTeamProfile">Редактировать
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pencil"
+                  viewBox="0 0 16 16">
+                  <path
+                    d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
+                </svg>
+              </button>
+              <a href="{% url 'invite_list' team.team_id %}">
+                <button class="btn btn-outline-dark">
+                  Пригласить
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                    class="bi bi-person-add" viewBox="0 0 16 16">
+                    <path
+                      d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4" />
+                    <path
+                      d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z" />
+                  </svg></button>
+              </a>
+              {% endif %}
+              <div class="mb-2">
+                <p class="mt-4 mb-1" style="font-size: 16 pt;">{{ team.xp }} xp</p>
+              </div>
+            </div>
+            <div class="card" style="border:none;">
+              <div class="card-body text-center">
+                <div class="row">
+                  <div class="col-5">
+                    <p class="mb-0">Дата создания</p>
+                  </div>
+                  <div class="col-7">
+                    <p class="text-muted mb-0">{{ team.created_at }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Блок с участниками -->
+        <div class="col-lg-8">
+          <div class="row">
+            <div class="col">
+              <div class="card mb-4 mb-md-0">
+                <div class="row text-center">
+                  <h3 class="mt-2">Сотрудники</h3>
+                </div>
+                <div class="card-body"
+                  style="overflow-y: auto; {% if user == team.owner %} height:354px; {% else %} height:299px; {% endif %}">
+                  <!-- Карточка участника -->
+                  {% for member, photo_url in members %}
+                  <div class="card m-2">
+                    <div class="row align-items-center">
+                      <div class="col-2 ms-1 me-1">
+                        <img src="{{ photo_url }}" class="card-img-top rounded-circle mx-auto d-block m-1"
+                          style="width: 50px; height: 50px;">
+                      </div>
+                      <div class="col-6" style="font-size: 14.5pt;">
+                        <p class="mt-3">{{member.employee.last_name}} {{member.employee.first_name}}
+                          {{member.employee.patronymic}}</p>
+                      </div>
+                      <div class="col-2" style="font-size: 14pt;">
+                        {% if member.employee == team.owner %}
+                        Глава
+                        {% else %}
+                        Сотрудник
+                        {% endif %}
+                      </div>
+                      {% if user == team.owner and member.employee != team.owner %}
+                      <div class="col-1">
+                        <a href="{% url 'kick' team_id=team.team_id employee_id=member.employee.id %}">
+                          <button class="btn btn-sm btn-outline-dark">Х</button>
+                        </a>
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Scrum-доска -->
+        <div class="container">
+          <div class="card">
+            <div class="row d-flex justify-content-center align-items-center">
+              <div class="col-3"></div>
+              <div class="col-5 text-center m-2">
+                <h1>Задачи команды</h1>
+              </div>
+              {% if user == team.owner %}
+              <div class="col-3 d-flex justify-content-end">
+                <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#CreateTaskModal">Добавить
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                    class="bi bi-clipboard-plus ms-1" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                      d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7" />
+                    <path
+                      d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z" />
+                    <path
+                      d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z" />
+                  </svg>
+                </button>
+              </div>
+              {% endif %}
+            </div>
+            <!-- В ожидании -->
+            <div class="scrum-board">
+              <div class="scrum-column scrum-column-todo">
+                <h2 class="text-center">В ожидании</h2>
+                {% for task in waiting_tasks %}
+                <div class="scrum-card-body">
+                  {% if user == team.owner %}
+                  <div class="col d-flex justify-content-end">
+                    <a href="{% url 'delete_task' task.task_id %}">
+                      <button type="submit" class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                    </a>
+                  </div>
+                  {% endif %}
+                  <div class="scrum-card">
+                    <div class="row">
+                      <input type="hidden" value="{{task.task_id}}" class="hidden-task-id">
+                      <input type="hidden" value="{{task.xp_reward}}" class="hidden-task-xp">
+                      <input type="hidden" value="{{task.coins_reward}}" class="hidden-task-coins">
+                      <div class="col-10">
+                        <h5>{{ task.title }}</h5>
+                      </div>
+                      <div class="row">
+                        <p>{{ task.description }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              <!-- В процессе -->
+              <div class="scrum-column scrum-column-inprogress">
+                <h2 class="text-center">В процессе</h2>
+                {% for task in in_progress_tasks %}
+                <div class="scrum-card-body">
+                  {% if user == team.owner %}
+                  <div class="col d-flex justify-content-end">
+                    <a href="{% url 'delete_task' task.task_id %}">
+                      <button type="submit" class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                    </a>
+                  </div>
+                  {% endif %}
+                  <div class="scrum-card">
+                    <div class="row">
+                      <input type="hidden" value="{{task.task_id}}" class="hidden-task-id">
+                      <input type="hidden" value="{{task.xp_reward}}" class="hidden-task-xp">
+                      <input type="hidden" value="{{task.coins_reward}}" class="hidden-task-coins">
+                      <div class="col-10">
+                        <h5>{{ task.title }}</h5>
+                        {% with assignment=task.assignments.first %}
+                        <h7 style="font-style: italic;">В работе у {{assignment.employee.username}}</h7>
+                        {% endwith %}
+                      </div>
+                      <div class="row"></div>
+                      <p>{{ task.description }}</p>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              <!-- Выполнено -->
+              <div class="scrum-column scrum-column-done">
+                <h2 class="text-center">Выполнено</h2>
+                {% for task in completed_tasks %}
+                <div class="scrum-card-body">
+                  {% if user == team.owner %}
+                  <div class="col d-flex justify-content-end">
+                    <a href="{% url 'delete_task' task.task_id %}">
+                      <button type="submit" class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                    </a>
+                  </div>
+                  {% endif %}
+                  <div class="scrum-card">
+                    <div class="row">
+                      <div class="col-10">
+                        <input type="hidden" value="{{task.task_id}}" class="hidden-task-id">
+                        <input type="hidden" value="{{task.xp_reward}}" class="hidden-task-xp">
+                        <input type="hidden" value="{{task.coins_reward}}" class="hidden-task-coins">
+                        <h5>{{ task.title }}</h5>
+                        {% if task.status.title == "На проверке" %}
+                        <p style="font-style: italic;">На проверке</p>
+                        {% else %}
+                        <p style="font-style: italic;">Выполнена</p>
+                        {% endif %}
+                        <!-- ^^^^ -->
+                      </div>
+                      <div class="row"></div>
+                      <p>{{ task.description }}</p>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- Modal-window CreateTasks -->
+  <div class="modal fade" id="CreateTaskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Создание задачи</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="createTaskForm" method="post" action="{% url 'create_task' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="col-form-label">Название:</label>
+              <input type="text" maxlength="30" required class="form-control" id="recipient-name" name="title">
+            </div>
+            <div class="mb-3">
+              <label for="message-text" class="col-form-label">Описание</label>
+              <textarea class="form-control" id="message-text" name="description"></textarea>
+            </div>
+            <div class="mb-3 d-flex justify-content-start" id="xp_coins_result">
+              <label class="col-form-label mx-3">XP:</label>
+              <input type="text" maxlength="30" readonly class="form-control" id="xp_tb">
+              <label class="col-form-label mx-3">Монеты:</label>
+              <input type="text" maxlength="30" readonly class="form-control" id="coins_tb">
+            </div>
+            <div class="d-flex justify-content-end my-3">
+              <button type='button' id="get_xp_coins_btn" class="btn btn-primary">Рассчитать стоимость задачи</button>
+            </div>
+            <input type="hidden" id="executor_id" name="executor">
+            <input type="hidden" name="team_id" value="{{ team.team_id }}">
+            <div class="container d-flex justify-content-end">
+              <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
+              <button type="submit" class="btn btn-success m-1" id="create-task-id" disabled>Создать</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal-window EditTeamProfile -->
+  <div class="modal fade" id="EditTeamProfile" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Редактирование команды</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editTeamForm" method="post" action="{% url 'edit_team' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="col-form-label">Название:</label>
+              <input type="text" class="form-control" id="team-name-tb" name="title" value="{{ team.title }}">
+            </div>
+            <div class="mb-3">
+              <label for="message-text" class="col-form-label">Фото:</label>
+              <input class="form-control" type="file" id="photo-team-profile-tb" name="photo" accept="image/*">
+            </div>
+            <input type="hidden" name="team_id" value="{{ team.team_id }}">
+            <div class="container d-flex justify-content-end">
+              <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
+              <button type="submit" class="btn btn-primary m-1">Сохранить</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal-window TaskDetailTodo -->
+  <div class="modal fade" id="TaskDetailTodo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Подробнее о задаче</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- ФОРМА "ВЗЯТЬ ЗАДАЧУ" -->
+          <form method="POST" action="{% url 'take_task' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <input type="hidden" id="task_id_todo" name="task_id" value="">
+              <label class="form-label">Название</label>
+              <input type="text" class="form-control" readonly id="task-detail-todo-name-tb">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Описание</label>
+              <textarea class="form-control" readonly id="task-detail-todo-description-tb" rows="3"></textarea>
+            </div>
+            <div class="mb-3 d-flex justify-content-start">
+              <label class="col-form-label mx-3">XP:</label>
+              <input type="text" maxlength="30" readonly class="form-control" id="xp_tb_todo" value="" name="title">
+              <label class="col-form-label mx-3">Монеты:</label>
+              <input type="text" maxlength="30" readonly class="form-control" value="" id="coins_tb_todo" name="title">
+            </div>
+            <div class="container d-flex justify-content-end">
+              {% if user == team.owner %}
+              <button class="btn btn-primary m-1" type="button" data-bs-target="#AddExecutor" id="appoint_to_btn"
+                data-bs-toggle="modal">Назначить
+                исполнителя</button>
+              {% endif %}
+              <button type="submit" class="btn btn-success m-1" id="take-task-btn" data-task-id="">Взять задачу</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal-window TaskDetailInProgress -->
+  <div class="modal fade" id="TaskDetailInProgress" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Подробнее о задаче</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- ФОРМА "ОТПРАВИТЬ ЗАДАЧУ НА ПРОВЕРКУ" -->
+          <form method="POST" action="{% url 'complete_task' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <input type="hidden" id="task_id_inprogress" value="" name="task_id">
+              <label class="form-label">Название</label>
+              <input type="text" class="form-control" readonly id="task-detail-in-progress-name-tb">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Описание</label>
+              <textarea class="form-control" readonly id="task-detail-in-progress-description-tb" rows="3"></textarea>
+            </div>
+            <div class="mb-3 d-flex justify-content-start"></div>
+            <label class="col-form-label mx-3">XP:</label>
+            <input type="text" maxlength="30" readonly class="form-control" id="xp_tb_ipprogress" name="title">
+            <label class="col-form-label mx-3">Монеты:</label>
+            <input type="text" maxlength="30" readonly class="form-control" id="coins_tb_inprogress" name="title">
+        </div>
+        <div class="container d-flex justify-content-end">
+          <button type="submit" class="btn btn-success m-1">Отправить на проверку</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+  <!-- Modal-window TaskDetailDone -->
+  <div class="modal fade" id="TaskDetailDone" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Подробнее о задаче</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- ФОРМА "ПРИНЯТЬ ЗАДАЧУ" -->
+          <form method="POST" action="">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label">Название</label>
+              <input type="hidden" id="task_id_done" value="">
+              <input type="text" class="form-control" readonly id="task-detail-done-name-tb">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Описание</label>
+              <textarea class="form-control" readonly id="task-detail-done-description-tb" rows="3"></textarea>
+              <!-- Если сообщение на проверке, и если его смотрит овнер, то отобразить кнопку "принять" -->
+              <div class="container d-flex justify-content-end">
+                {% if user == team.owner %}
+                <button type="submit" class="btn btn-sm btn-success">Принять</button>
+                {% endif %}
+              </div>
+            </div>
+            <div class="mb-3 d-flex justify-content-start">
+              <label class="col-form-label mx-3">XP:</label>
+              <input type="text" maxlength="30" readonly class="form-control" id="xp_tb_done" name="title">
+              <label class="col-form-label mx-3">Монеты:</label>
+              <input type="text" maxlength="30" readonly class="form-control" id="coins_tb_done" name="title">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ModalWindow AddExecutor -->
+  <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="AddExecutor" tabindex="-1"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Назначение сотрудника на решение задачи</h5>
+        </div>
+        <div class="modal-body">
+          <!-- ФОРМА "НАЗНАЧИТЬ ЗАДАЧУ НА кого-то " -->
+          <form method="POST" action="{% url 'assign_task' %}">
+            {% csrf_token %}
+            <input type="hidden" id="appoint-to-task-id" name="task_id" value="">
+            <input type="text" class="form-control mb-4" id="add-executor-tb" placeholder="Кого вы хотите назначить?">
+            <input type="hidden" id="add-executor-id" name="executor_id" value="">
+            <!-- Скрытое поле для хранения id исполнителя -->
+            <div class="card-body" style="overflow-y: auto; overflow-x: hidden; max-height: 700px;">
+              <!-- Карточка пользователя -->
+              {% for member, photo_url in members %}
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="member{{ member.employee.id }}" id="add-executor">
+                <div class="card executor-card mb-1" data-member-id="{{ member.employee.id }}"
+                  data-name="{{ member.employee.last_name }} {{ member.employee.first_name }} {{ member.employee.patronymic }}">
+                  <div class="card-body">
+                    <a class="card-link" style="text-decoration: none; color: inherit; cursor:pointer"
+                      data-value="{{ member.employee.id }}">
+                      <div class="row align-items-center">
+                        <div class="col-2 m-1">
+                          <img src="{{ photo_url }}" class="card-img-top rounded-circle mx-auto d-block m-1"
+                            style="width: 50px; height: 50px;">
+                        </div>
+                        <div class="col-8" style="font-size: 14.5pt;">
+                          <p><span style="font-style: italic;">ФИО: </span>{{ member.employee.last_name }}
+                            {{member.employee.first_name }} {{ member.employee.patronymic }}</p>
+                          <p><span style="font-style: italic;">Логин: </span>{{ member.employee.username }}</p>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="d-flex justify-content-end">
+              <button class="btn btn-danger m-2" type="button" id="cancel-btn" href="#">Отменить</button>
+              <button class="btn btn-success m-2" type="submit">Назначить</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script>
+    // create task script
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById('createTaskForm');
+      const editForm = document.getElementById('editTeamForm'); // Исправлено на editTeamForm
+      const dropdownItems = document.querySelectorAll('.dropdown-item');
+
+
+      dropdownItems.forEach(item => {
+        item.addEventListener('click', function (event) {
+          event.preventDefault();
+          executorInput.value = item.innerText;
+          executorIdInput.value = item.getAttribute('data-value');
+        });
+      });
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const formData = new FormData(form);
+        fetch(form.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+          }
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              clearFormFields();
+              window.location.reload();
+            } else {
+              alert('Ошибка при создании задачи');
+            }
+          })
+          .catch(error => {
+            console.error('Ошибка при отправке запроса:', error);
+          });
+      });
+
+      editForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const formData = new FormData(editForm);
+        const teamId = editForm.querySelector('input[name="team_id"]').value;
+        fetch(editForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+          }
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              window.location.reload();
+            } else {
+              alert('Ошибка при редактировании команды');
+            }
+          })
+          .catch(error => {
+            console.error('Ошибка при отправке запроса:', error);
+          });
+      });
+
+      function clearFormFields() {
+        document.getElementById('recipient-name').value = '';
+        document.getElementById('message-text').value = '';
+        document.getElementById('executor_id').value = '';
+        document.getElementById('xp_tb').value = '';
+        document.getElementById('coins_tb').value = '';
+      }
+    });
+
+
+    document.querySelectorAll('#InviteUser .dropdown-item').forEach(item => {
+      item.addEventListener('click', event => {
+        event.preventDefault();
+        document.getElementById('invite-user-tb').value = event.target.innerText;
+      });
+    });
+
+    document.querySelectorAll('.scrum-card').forEach(item => {
+      const title = item.querySelector('h5').innerText;
+      const description = item.querySelector('p').innerText;
+
+      const column = item.closest('.scrum-column');
+      const columnClass = column ? column.className : 'unknown';
+      const task_id = item.querySelector('.hidden-task-id').value;
+
+      const task_xp = item.querySelector('.hidden-task-xp').value;
+      const task_coins = item.querySelector('.hidden-task-coins').value;
+      item.dataset.bsToggle = "modal";
+      switch (columnClass) {
+        case 'scrum-column scrum-column-todo':
+          item.dataset.bsTarget = "#TaskDetailTodo";
+          break;
+        case 'scrum-column scrum-column-inprogress':
+          item.dataset.bsTarget = "#TaskDetailInProgress";
+          break;
+        case 'scrum-column scrum-column-done':
+          item.dataset.bsTarget = "#TaskDetailDone";
+          break;
+      }
+
+      item.addEventListener('click', function () {
+        fillTaskDetail(title, description, columnClass, task_id, task_xp, task_coins, item);
+
+      });
+    });
+
+    function fillTaskDetail(title, description, column, task_id, xp, coins, item) {
+      switch (column) {
+        case 'scrum-column scrum-column-todo':
+          document.getElementById('task_id_todo').value = task_id;
+          document.getElementById('task-detail-todo-name-tb').value = title;
+          document.getElementById('task-detail-todo-description-tb').value = description;
+          document.getElementById('coins_tb_todo').value = coins;
+          document.getElementById('xp_tb_todo').value = xp;
+          break;
+        case 'scrum-column scrum-column-inprogress':
+          document.getElementById('task_id_inprogress').value = task_id;
+          document.getElementById('task-detail-in-progress-name-tb').value = title;
+          document.getElementById('task-detail-in-progress-description-tb').value = description;
+          document.getElementById('coins_tb_inprogress').value = coins;
+          document.getElementById('xp_tb_inprogress').value = xp;
+          break;
+        case 'scrum-column scrum-column-done':
+          document.getElementById('task_id_done').value = task_id;
+          document.getElementById('task-detail-done-name-tb').value = title;
+          document.getElementById('task-detail-done-description-tb').value = description;
+          document.getElementById('coins_tb_done').value = coins;
+          document.getElementById('xp_tb_done').value = xp;
+          break;
+      }
+    }
+
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', function () {
+        const memberId = this.getAttribute('data-member-id');
+        const radioButton = document.getElementById(`member_${memberId}`);
+        if (radioButton) {
+          radioButton.checked = true;
+        }
+      });
+    });
+    document.getElementById('add-executor-tb').addEventListener('input', function () {
+      const filterValue = this.value.toLowerCase();
+      const formChecks = document.querySelectorAll('.form-check');
+
+      formChecks.forEach(formCheck => {
+        const card = formCheck.querySelector('.executor-card');
+        const name = card.getAttribute('data-name').toLowerCase();
+        if (name.includes(filterValue)) {
+          formCheck.style.display = 'block';
+        } else {
+          formCheck.style.display = 'none';
+        }
+      });
+    });
+    document.querySelectorAll('.executor-card').forEach(card => {
+      card.addEventListener('click', function () {
+        const memberId = this.getAttribute('data-member-id');
+        const memberName = this.getAttribute('data-name');
+        document.getElementById('add-executor-id').value = memberId;
+        document.getElementById('add-executor-tb').value = memberName;
+      });
+    });
+    document.getElementById('cancel-btn').addEventListener('click', function () {
+      location.reload();
+    });
+    document.getElementById('appoint_to_btn').addEventListener('click', function () {
+      document.getElementById('appoint-to-task-id').value = document.getElementById('task_id_todo').value;
+    });
+    document.querySelectorAll('.close-button').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        // Логика для удаления задачи
+      });
+    });
+
+    document.getElementById('get_xp_coins_btn').addEventListener('click', function () {
+      const headers = $('#recipient-name').val();
+      const description = $('#message-text').val();
+      const taskText = headers + ' ' + description;
+
+      $.ajax({
+        url: "{% url 'calculate_reward' %}",
+        type: "POST",
+        data: {
+          task_text: taskText,
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function (response) {
+          if (response.error) {
+            $('#xp_coins_result').html(`<p>Ошибка: ${response.error}</p>`);
+          } else {
+            console.log(response);
+            $('#xp_tb').val(response.experience);
+            $('#coins_tb').val(response.coins);
+            $('#create-task-id').prop('disabled', false);
+          }
+        },
+        error: function (xhr, status, error) {
+          $('#xp_coins_result').html(`<p>Ошибка: ${error}</p>`);
+        }
+      });
+    });
+
+  </script>
+</body>
+
+{% endblock %}
+
+{% block js-scripts %}
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+{% endblock %}

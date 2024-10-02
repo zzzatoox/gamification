@@ -1,0 +1,46 @@
+{% load static %}
+<head>
+  {% block head %}
+  {% endblock %}
+</head>
+{% include "navbar.html" %}
+
+<body style="background-color: #F5F5F5;">
+
+  {% block body %}
+  {% endblock %}
+  
+
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11;">
+    {% for message in messages %}
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+      <div class="toast-header">
+        <span class="bi {% if 'success' in message.tags %}bi-check-circle{% else %}bi-exclamation-circle{% endif %} me-2"></span>
+        <strong class="me-auto">{% if 'success' in message.tags %}Успешно!{% else %}Ошибка!{% endif %}</strong>
+        <small>some_time</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        <p class="{{ message.tags }}"> {{ message|safe }} </p>  
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+</body>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+      var toastList = toastElList.map(function (toastEl) {
+          return new bootstrap.Toast(toastEl)
+      })
+      toastList.forEach(toast => toast.show())
+
+      toastElList.forEach(function(toastEl) {
+          var timeElement = toastEl.querySelector('.toast-header small');
+          timeElement.textContent = new Date().toLocaleString();
+      });
+  });
+</script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+{% block js-scripts %}
+{% endblock %}  

@@ -1,0 +1,68 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap" rel="stylesheet">
+
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary" style="font-size: 16pt;">
+    <div class="container-fluid">
+        {% if not user.is_authenticated %}
+        <a class="navbar-brand mx-5" style="font-size: 30pt; font-family: Pirata One, cursive;" href="/">SWORD</a>
+        {% else %}
+        <a class="navbar-brand mx-5" style="font-size: 30pt; font-family: Pirata One, cursive;"
+            href="{% url 'teams' %}">SWORD</a>
+        {% endif %}
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto my-lg-0">
+                {% if not user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Главная</a>
+                </li>
+                {% endif %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle active" id="navbarDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        Рейтинги
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="{% url 'ratings_teams' %}">Команды</a></li>
+                        <li><a class="dropdown-item" href="{% url 'ratings_users' %}">Сотрудники</a></li>
+                    </ul>
+
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'teams' %}">Команды</a>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{% url 'shop' %}">
+                        Магазин
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'profile' user.id %}">{{user.username}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'logout' %}">Выход</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'authorization' %}">Вход</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'registration' %}">Регистрация</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>

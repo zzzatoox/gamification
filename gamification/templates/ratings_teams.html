@@ -1,0 +1,114 @@
+{% extends 'main_template.html' %}
+{% load static %}
+
+{% block head %}
+<title>Рейтинги команд</title>
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<style>
+    .podium {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        height: 300px;
+        margin-bottom: 20px;
+    }
+
+    .podium-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        width: 200px;
+        text-align: center;
+    }
+
+    .podium-step img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+    }
+
+    .podium-step .position {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .podium-step .team-name {
+        font-size: 18px;
+    }
+
+    .podium-step:nth-child(1) {
+        height: 100px;
+        background-color: #c0c0c0;
+        box-shadow: inset 0 0 3rem rgba(0, 0, 0, .1)
+    }
+
+    .podium-step:nth-child(2) {
+        height: 150px;
+        background-color: #ffd900;
+        box-shadow: inset 0 0 3rem rgba(0, 0, 0, .1)
+    }
+
+    .podium-step:nth-child(3) {
+        height: 50px;
+        background-color: #ff8000;
+        box-shadow: inset 0 0 3rem rgba(0, 0, 0, .1)
+    }
+</style>
+{% endblock %}
+
+
+{% block body %}
+
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Лидеры среди команд</h1>
+
+        <!-- Пьедестал -->
+        <div class="podium">
+            {% for team in top_teams %}
+            <div class="podium-step">
+                {% if forloop.counter == 1 %}
+                <div class="position">2</div>
+                {% elif forloop.counter == 2 %}
+                <div class="position">1</div>
+                {% elif forloop.counter == 3 %}
+                <div class="position">3</div>
+                {% endif %}
+                <img src="{{ team.photo_url }}" alt="{{ team.team.title }}">
+                <div class="team-name">{{ team.team.title }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Таблица с остальными командами -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Фото</th>
+                    <th>Команда</th>
+                    <th>Очки</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in other_teams %}
+                <tr>
+                    <td>{{ forloop.counter|add:3 }}</td>
+                    <td><img class="rounded-circle" style="width: 50px; height: 50px;" src="{{ team.photo_url }}"
+                            alt="{{ team.team.title }}"></td>
+                    <td>{{ team.team.title }}</td>
+                    <td>{{ team.team.xp }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+{% endblock %}
+
+
+{% block js-scripts %}
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+{% endblock %}

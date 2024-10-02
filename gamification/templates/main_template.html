@@ -12,18 +12,19 @@
   
 
   <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11;">
-    {% if error_message %}
-      <div class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
-        <div class="toast-header">
-          <strong class="me-auto">Внимание</strong>
-          <small>some_time</small>
-          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-          <p> {{ error_message }} </p>  
-        </div>
+    {% for message in messages %}
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+      <div class="toast-header">
+        <span class="bi {% if 'success' in message.tags %}bi-check-circle{% else %}bi-exclamation-circle{% endif %} me-2"></span>
+        <strong class="me-auto">{% if 'success' in message.tags %}Успешно!{% else %}Ошибка!{% endif %}</strong>
+        <small>some_time</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
-    {% endif %}
+      <div class="toast-body">
+        <p class="{{ message.tags }}"> {{ message|safe }} </p>  
+      </div>
+    </div>
+  {% endfor %}
   </div>
 </body>
 <script>

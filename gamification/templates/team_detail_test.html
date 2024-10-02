@@ -161,12 +161,16 @@
                 <div class="scrum-card-body">
                   {% if user == team.owner %}
                   <div class="col d-flex justify-content-end">
-                    <button class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                    <form method="post" action="{% url 'delete_task' %}" class="delete-task-form">
+                      {% csrf_token %}
+                      <input type="hidden" name="task_id" value="{{ task.task_id }}">
+                      <button type="submit" class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                    </form>
                   </div>
                   {% endif %}
                   <div class="scrum-card">
                     <div class="row">
-                      <input type="hidden" value="{{task.task_id}}" class="hidden-task-id">
+                      <input type="hidden" value="{{ task.task_id }}" class="hidden-task-id">
                       <div class="col-10">
                         <h5>{{ task.title }}</h5>
                       </div>
@@ -178,65 +182,70 @@
                 </div>
                 {% endfor %}
               </div>
-              <!-- В процессе -->
-              <div class="scrum-column scrum-column-inprogress">
-                <h2 class="text-center">В процессе</h2>
-                {% for task in in_progress_tasks %}
-                <div class="scrum-card-body">
-                  {% if user == team.owner %}
-                  <div class="col d-flex justify-content-end">
-                    <button class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+            </div>
+            <!-- В процессе -->
+            <div class="scrum-column scrum-column-inprogress">
+              <h2 class="text-center">В процессе</h2>
+              {% for task in in_progress_tasks %}
+              <div class="scrum-card-body">
+                {% if user == team.owner %}
+                <div class="col d-flex justify-content-end">
+                  <button class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                </div>
+                {% endif %}
+                <div class="scrum-card">
+                  <div class="row">
+                    <input type="hidden" value="{{task.task_id}}" class="hidden-task-id">
+                    <input type="hidden" value="{{task.xp_reward}}" class="hidden-task-xp">
+                    <input type="hidden" value="{{task.coins_reward}}" class="hidden-task-coins">
+                    <div class="col-10">
+                      <h5>{{ task.title }}</h5>
+                      {% with assignment=task.assignments.first %}
+                      <h7 style="font-style: italic;">В работе у {{assignment.employee.username}}</h7>
+                      {% endwith %}
+                    </div>
+                    <div class="row"></div>
+                    <p>{{ task.description }}</p>
                   </div>
-                  {% endif %}
-                  <div class="scrum-card">
-                    <div class="row">
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            <!-- Выполнено -->
+            <div class="scrum-column scrum-column-done">
+              <h2 class="text-center">Выполнено</h2>
+              {% for task in completed_tasks %}
+              <div class="scrum-card-body">
+                {% if user == team.owner %}
+                <div class="col d-flex justify-content-end">
+                  <button class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
+                </div>
+                {% endif %}
+                <div class="scrum-card">
+                  <div class="row">
+                    <div class="col-10">
                       <input type="hidden" value="{{task.task_id}}" class="hidden-task-id">
-                      <div class="col-10">
-                        <h5>{{ task.title }}</h5>
-                        {% with assignment=task.assignments.first %}
-                        <h7 style="font-style: italic;">В работе у {{assignment.employee.username}}</h7>
-                        {% endwith %}
-                      </div>
-                      <div class="row"></div>
-                      <p>{{ task.description }}</p>
+                      <input type="hidden" value="{{task.xp_reward}}" class="hidden-task-xp">
+                      <input type="hidden" value="{{task.coins_reward}}" class="hidden-task-coins">
+                      <h5>{{ task.title }}</h5>
+                      {% if task.status.title == "На проверке" %}
+                      <p style="font-style: italic;">На проверке</p>
+                      {% else %}
+                      <p style="font-style: italic;">Выполнена</p>
+                      {% endif %}
+                      <!-- ^^^^ -->
                     </div>
+                    <div class="row"></div>
+                    <p>{{ task.description }}</p>
                   </div>
                 </div>
-                {% endfor %}
               </div>
-              <!-- Выполнено -->
-              <div class="scrum-column scrum-column-done">
-                <h2 class="text-center">Выполнено</h2>
-                {% for task in completed_tasks %}
-                <div class="scrum-card-body">
-                  {% if user == team.owner %}
-                  <div class="col d-flex justify-content-end">
-                    <button class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
-                  </div>
-                  {% endif %}
-                  <div class="scrum-card">
-                    <div class="row">
-                      <div class="col-10">
-                        <input type="hidden" value="{{task.task_id}}" class="hidden-task-id">
-                        <h5>{{ task.title }}</h5>
-                        {% if task.status.title == "На проверке" %}
-                        <p style="font-style: italic;">На проверке</p>
-                        {% else %}
-                        <p style="font-style: italic;">Выполнена</p>
-                        {% endif %}
-                        <!-- ^^^^ -->
-                      </div>
-                      <div class="row"></div>
-                      <p>{{ task.description }}</p>
-                    </div>
-                  </div>
-                </div>
-                {% endfor %}
-              </div>
+              {% endfor %}
             </div>
           </div>
         </div>
       </div>
+    </div>
     </div>
     </div>
   </section>
@@ -334,9 +343,9 @@
             </div>
             <div class="mb-3 d-flex justify-content-start">
               <label class="col-form-label mx-3">XP:</label>
-              <input type="text" maxlength="30" readonly class="form-control" id="xp_tb" name="title">
+              <input type="text" maxlength="30" readonly class="form-control" id="xp_tb_todo" value="" name="title">
               <label class="col-form-label mx-3">Монеты:</label>
-              <input type="text" maxlength="30" readonly class="form-control" id="coins_tb" name="title">
+              <input type="text" maxlength="30" readonly class="form-control" value="" id="coins_tb_todo" name="title">
             </div>
             <div class="container d-flex justify-content-end">
               {% if user == team.owner %}
@@ -374,16 +383,21 @@
             </div>
             <div class="mb-3 d-flex justify-content-start"></div>
             <label class="col-form-label mx-3">XP:</label>
-            <input type="text" maxlength="30" readonly class="form-control" id="xp_tb" name="title">
+            <input type="text" maxlength="30" readonly class="form-control" id="xp_tb_ipprogress" name="title">
             <label class="col-form-label mx-3">Монеты:</label>
-            <input type="text" maxlength="30" readonly class="form-control" id="coins_tb" name="title">
+            <input type="text" maxlength="30" readonly class="form-control" id="coins_tb_inprogress" name="title">
         </div>
         <div class="container d-flex justify-content-end">
           <button type="submit" class="btn btn-success m-1">Отправить на проверку</button>
         </div>
         </form>
       </div>
+      <div class="container d-flex justify-content-end">
+        <button type="submit" class="btn btn-success m-1">Отправить на проверку</button>
+      </div>
+      </form>
     </div>
+  </div>
   </div>
   </div>
   <!-- Modal-window TaskDetailDone -->
@@ -415,9 +429,9 @@
             </div>
             <div class="mb-3 d-flex justify-content-start">
               <label class="col-form-label mx-3">XP:</label>
-              <input type="text" maxlength="30" readonly class="form-control" id="xp_tb" name="title">
+              <input type="text" maxlength="30" readonly class="form-control" id="xp_tb_done" name="title">
               <label class="col-form-label mx-3">Монеты:</label>
-              <input type="text" maxlength="30" readonly class="form-control" id="coins_tb" name="title">
+              <input type="text" maxlength="30" readonly class="form-control" id="coins_tb_done" name="title">
             </div>
           </form>
         </div>
@@ -564,6 +578,9 @@
       const column = item.closest('.scrum-column');
       const columnClass = column ? column.className : 'unknown';
       const task_id = item.querySelector('.hidden-task-id').value;
+
+      const task_xp = item.querySelector('.hidden-task-xp').value;
+      const task_coins = item.querySelector('.hidden-task-coins').value;
       item.dataset.bsToggle = "modal";
       switch (columnClass) {
         case 'scrum-column scrum-column-todo':
@@ -578,27 +595,33 @@
       }
 
       item.addEventListener('click', function () {
-        fillTaskDetail(title, description, columnClass, task_id, item);
+        fillTaskDetail(title, description, columnClass, task_id, task_xp, task_coins, item);
 
       });
     });
 
-    function fillTaskDetail(title, description, column, task_id, item) {
+    function fillTaskDetail(title, description, column, task_id, xp, coins, item) {
       switch (column) {
         case 'scrum-column scrum-column-todo':
           document.getElementById('task_id_todo').value = task_id;
           document.getElementById('task-detail-todo-name-tb').value = title;
           document.getElementById('task-detail-todo-description-tb').value = description;
+          document.getElementById('coins_tb_todo').value = coins;
+          document.getElementById('xp_tb_todo').value = xp;
           break;
         case 'scrum-column scrum-column-inprogress':
           document.getElementById('task_id_inprogress').value = task_id;
           document.getElementById('task-detail-in-progress-name-tb').value = title;
           document.getElementById('task-detail-in-progress-description-tb').value = description;
+          document.getElementById('coins_tb_inprogress').value = coins;
+          document.getElementById('xp_tb_inprogress').value = xp;
           break;
         case 'scrum-column scrum-column-done':
           document.getElementById('task_id_done').value = task_id;
           document.getElementById('task-detail-done-name-tb').value = title;
           document.getElementById('task-detail-done-description-tb').value = description;
+          document.getElementById('coins_tb_done').value = coins;
+          document.getElementById('xp_tb_done').value = xp;
           break;
       }
     }
@@ -674,8 +697,35 @@
         }
       });
     });
-  </script>
 
+  </script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Удаление карточки -->
+  <script>
+    $(document).ready(function () {
+      $('.delete-task-form').on('submit', function (event) {
+        event.preventDefault();
+
+        var form = $(this);
+        var url = form.attr('action');
+        var method = form.attr('method');
+        var data = form.serialize();
+
+        $.ajax({
+          url: url,
+          type: method,
+          data: data,
+          success: function (response) {
+            form.closest('.scrum-card-body').remove();
+          },
+          error: function (xhr, status, error) {
+            alert('Произошла ошибка при удалении задачи: ' + error);
+          }
+        });
+      });
+    });
+  </script>
 
 </body>
 

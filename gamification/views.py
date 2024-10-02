@@ -51,6 +51,7 @@ def authorization(request):
 
             if user.check_password(password):
                 auth_login(request, user)
+                messages.success(request, "Вы успешно авторизовались")
                 return redirect("home")
             else:
                 messages.error(request, "Неверный логин или пароль")
@@ -70,7 +71,13 @@ def registration(request):
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
+            messages.success(request, "Вы успешно зарегистрировались")
             return redirect("home")
+        else:
+            messages.error(
+                request,
+                "Ошибка при регистрации. Пожалуйста, проверьте введенные данные.",
+            )
     else:
         form = RegistrationForm()
     return render(request, "account/registration.html", {"form": form})

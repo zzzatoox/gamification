@@ -214,7 +214,7 @@
                         {% if task.status.title == "На проверке" %}
                         <p style="font-style: italic;">На проверке</p>
                         {% else %}
-                        <p style="font-style: italic;">Выполнено</p>
+                        <p style="font-style: italic;">Выполнена</p>
                         {% endif %}
                         <!-- ^^^^ -->
                       </div>
@@ -257,7 +257,7 @@
             <input type="hidden" name="team_id" value="{{ team.team_id }}">
             <div class="container d-flex justify-content-end">
               <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
-              <button type="submit" class="btn btn-primary m-1">Создать</button>
+              <button type="submit" class="btn btn-primary m-1" id="create-task-id">Создать</button>
             </div>
           </form>
         </div>
@@ -589,6 +589,9 @@
     document.getElementById('cancel-btn').addEventListener('click', function () {
       location.reload();
     });
+    // document.getElementById('create-task-id').addEventListener('click', function () {
+    //   location.reload();
+    // });
     document.querySelectorAll('.close-button').forEach(button => {
       button.addEventListener('click', event => {
         event.preventDefault();

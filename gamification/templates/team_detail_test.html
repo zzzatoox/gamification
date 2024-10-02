@@ -203,7 +203,7 @@
                 </div>
                 {% endfor %}
               </div>
-                <!-- Выполнено -->
+              <!-- Выполнено -->
               <div class="scrum-column scrum-column-done">
                 <h2 class="text-center">Выполнено</h2>
                 {% for task in completed_tasks %}
@@ -213,7 +213,7 @@
                     <button class="btn btn-sm btn-outline-dark btn-close delete-card"></button>
                   </div>
                   {% endif %}
-                  <div class="scrum-card" >
+                  <div class="scrum-card">
                     <div class="row">
                       <div class="col-10">
                         <input type="hidden" value="{{task.task_id}}" class="hidden-task-id">
@@ -313,25 +313,26 @@
         </div>
         <div class="modal-body">
           <!-- ФОРМА "ВЗЯТЬ ЗАДАЧУ" -->
-          <form method="POST" action="">
+          <form method="POST" action="{% url 'take_task' %}">
             {% csrf_token %}
             <div class="mb-3">
-              <input type="hidden" id="task_id_todo" value="">
+              <input type="hidden" id="task_id_todo" name="task_id" value="">
               <label class="form-label">Название</label>
-            <input type="text" class="form-control" readonly id="task-detail-todo-name-tb">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Описание</label>
-            <textarea class="form-control" readonly id="task-detail-todo-description-tb" rows="3"></textarea>
-          </div>
-          <div class="container d-flex justify-content-end">
-            {% if user == team.owner %}
-            <button class="btn btn-primary m-1" data-bs-target="#AddExecutor" id="appoint_to_btn" data-bs-toggle="modal">Назначить
-              исполнителя</button>  
-              {% endif %}
+              <input type="text" class="form-control" readonly id="task-detail-todo-name-tb">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Описание</label>
+              <textarea class="form-control" readonly id="task-detail-todo-description-tb" rows="3"></textarea>
+            </div>
+            <div class="container d-flex justify-content-end">
               <button type="submit" class="btn btn-success m-1" id="take-task-btn" data-task-id="">Взять задачу</button>
             </div>
           </form>
+          {% if user == team.owner %}
+          <button class="btn btn-primary m-1" data-bs-target="#AddExecutor" id="appoint_to_btn"
+            data-bs-toggle="modal">Назначить
+            исполнителя</button>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -401,46 +402,46 @@
         </div>
         <div class="modal-body">
           <!-- ФОРМА "НАЗНАЧИТЬ ЗАДАЧУ НА кого-то " -->
-          <form method="POST" action="">
+          <form method="POST" action="{% url 'assign_task' %}">
             {% csrf_token %}
-            <input type="hidden" id="appoint-to-task-id" value="">
+            <input type="hidden" id="appoint-to-task-id" name="task_id" value="">
             <input type="text" class="form-control mb-4" id="add-executor-tb" placeholder="Кого вы хотите назначить?">
             <div class="card-body" style="overflow-y: auto; overflow-x: hidden; max-height: 700px;">
-            <!-- Карточка пользователя -->
-            {% for member, photo_url in members %}
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="flexRadioDefault" id="member_{{ member.employee.id }}"
-                checked>
-              <div class="card executor-card mb-1" data-member-id="{{ member.employee.id }}"
-                data-name="{{ member.employee.last_name }} {{ member.employee.first_name }} {{ member.employee.patronymic }}">
-                <div class="card-body">
-                  <a class="card-link" style="text-decoration: none; color: inherit; cursor:pointer"
-                  data-value="{{ member.employee.id }}">
-                    <div class="row align-items-center">
-                      <div class="col-2 m-1">
-                        <img src="{{ photo_url }}" class="card-img-top rounded-circle mx-auto d-block m-1"
-                        style="width: 50px; height: 50px;">
+              <!-- Карточка пользователя -->
+              {% for member, photo_url in members %}
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault"
+                  id="member_{{ member.employee.id }}" checked>
+                <div class="card executor-card mb-1" data-member-id="{{ member.employee.id }}"
+                  data-name="{{ member.employee.last_name }} {{ member.employee.first_name }} {{ member.employee.patronymic }}">
+                  <div class="card-body">
+                    <a class="card-link" style="text-decoration: none; color: inherit; cursor:pointer"
+                      data-value="{{ member.employee.id }}">
+                      <div class="row align-items-center">
+                        <div class="col-2 m-1">
+                          <img src="{{ photo_url }}" class="card-img-top rounded-circle mx-auto d-block m-1"
+                            style="width: 50px; height: 50px;">
+                        </div>
+                        <div class="col-8" style="font-size: 14.5pt;">
+                          <p><span style="font-style: italic;">ФИО: </span>{{ member.employee.last_name }} {{
+                            member.employee.first_name }} {{ member.employee.patronymic }}</p>
+                          <p><span style="font-style: italic;">Логин: </span>{{ member.employee.username }}</p>
+                        </div>
                       </div>
-                      <div class="col-8" style="font-size: 14.5pt;">
-                        <p><span style="font-style: italic;">ФИО: </span>{{ member.employee.last_name }} {{
-                          member.employee.first_name }} {{ member.employee.patronymic }}</p>
-                        <p><span style="font-style: italic;">Логин: </span>{{ member.employee.username }}</p>
-                      </div>
-                    </div>
-                  </a>
+                    </a>
+                  </div>
                 </div>
               </div>
+              {% endfor %}
             </div>
-            {% endfor %}
-          </div>
-          <div class="d-flex justify-content-end">
-            <button class="btn btn-danger m-2" id="cancel-btn" href="#">Отменить</button>
-            <button class="btn btn-success m-2" type="submit">Назначить</button>
+            <div class="d-flex justify-content-end">
+              <button class="btn btn-danger m-2" id="cancel-btn" href="#">Отменить</button>
+              <button class="btn btn-success m-2" type="submit">Назначить</button>
           </form>
-          </div>
         </div>
       </div>
     </div>
+  </div>
   </div>
 
   <script>
@@ -449,7 +450,7 @@
       const form = document.getElementById('createTaskForm');
       const editForm = document.getElementById('editTeamForm'); // Исправлено на editTeamForm
       const dropdownItems = document.querySelectorAll('.dropdown-item');
-      
+
 
       dropdownItems.forEach(item => {
         item.addEventListener('click', function (event) {
@@ -522,14 +523,14 @@
       });
     });
 
-document.querySelectorAll('.scrum-card').forEach(item => {
-    const title = item.querySelector('h5').innerText;
-    const description = item.querySelector('p').innerText;
+    document.querySelectorAll('.scrum-card').forEach(item => {
+      const title = item.querySelector('h5').innerText;
+      const description = item.querySelector('p').innerText;
 
-    const column = item.closest('.scrum-column');
-    const columnClass = column ? column.className : 'unknown';
-    const task_id = item.querySelector('.hidden-task-id').value;
-    item.dataset.bsToggle = "modal";
+      const column = item.closest('.scrum-column');
+      const columnClass = column ? column.className : 'unknown';
+      const task_id = item.querySelector('.hidden-task-id').value;
+      item.dataset.bsToggle = "modal";
       switch (columnClass) {
         case 'scrum-column scrum-column-todo':
           item.dataset.bsTarget = "#TaskDetailTodo";
@@ -551,17 +552,17 @@ document.querySelectorAll('.scrum-card').forEach(item => {
     function fillTaskDetail(title, description, column, task_id, item) {
       switch (column) {
         case 'scrum-column scrum-column-todo':
-          document.getElementById('task_id_todo').value=task_id;
+          document.getElementById('task_id_todo').value = task_id;
           document.getElementById('task-detail-todo-name-tb').value = title;
           document.getElementById('task-detail-todo-description-tb').value = description;
           break;
         case 'scrum-column scrum-column-inprogress':
-        document.getElementById('task_id_inprogress').value=task_id;
+          document.getElementById('task_id_inprogress').value = task_id;
           document.getElementById('task-detail-in-progress-name-tb').value = title;
           document.getElementById('task-detail-in-progress-description-tb').value = description;
           break;
         case 'scrum-column scrum-column-done':
-        document.getElementById('task_id_done').value=task_id;
+          document.getElementById('task_id_done').value = task_id;
           document.getElementById('task-detail-done-name-tb').value = title;
           document.getElementById('task-detail-done-description-tb').value = description;
           break;
@@ -594,7 +595,7 @@ document.querySelectorAll('.scrum-card').forEach(item => {
     document.getElementById('cancel-btn').addEventListener('click', function () {
       location.reload();
     });
-    document.getElementById('appoint_to_btn').addEventListener('click', function(){
+    document.getElementById('appoint_to_btn').addEventListener('click', function () {
       document.getElementById('appoint-to-task-id').value = document.getElementById('task_id_todo').value;
     });
     document.querySelectorAll('.close-button').forEach(button => {

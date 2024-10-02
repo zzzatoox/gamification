@@ -369,12 +369,12 @@ class Product(models.Model):
         verbose_name="Цена",
         help_text="Цена товара",
     )
-    image = models.ImageField(
+    photo = models.ImageField(
         upload_to="products/",
         null=True,
         blank=True,
         verbose_name="Фото",
-        help_text="Фотография достижения",
+        help_text="Фотография товара",
     )
     is_available = models.BooleanField(
         default=True,

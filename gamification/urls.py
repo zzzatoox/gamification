@@ -23,6 +23,7 @@ urlpatterns = [
     path("ratings_users/", views.ratings_users, name="ratings_users"),
     path("invite/", views.invite_in_team, name="invite"),  # <int:team_id>
     path("shop/", views.shop, name="shop"),
+    path("buy_product/", views.buy_product, name="buy_product"),
 ]
 
 if settings.DEBUG:

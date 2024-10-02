@@ -23,6 +23,7 @@ from .models import (
     TaskEmployee,
     UserProfile,
     Status,
+    Product,
 )
 
 CREATED_STATUS = Status.objects.get_or_create(title="Создана")[0]
@@ -259,11 +260,16 @@ def invite_in_team(request):  #  (request, team_id)
 
 @login_required(login_url="authorization")
 def shop(request):
+    products = Product.objects.all()
     return render(
         request,
         "shop.html",
-        {},
+        {"products": products},
     )
+
+
+@login_required(login_url="authorization")
+def buy_product(request): ...
 
 
 def get_user_photo_url(user):
@@ -331,25 +337,28 @@ def create_task(request):
 
 @login_required
 def take_task(request, task_id):
-    task = get_object_or_404(Task, task_id=task_id)
-    user = request.user
+    if request.method == "POST":
+        task = get_object_or_404(Task, task_id=task_id)
+        user = request.user
 
-    # Проверка, что задача еще не взята другим пользователем
-    if TaskEmployee.objects.filter(task=task).exists():
-        return JsonResponse(
-            {"success": False, "message": "Задача уже взята другим пользователем."}
-        )
+        # Проверка, что задача еще не взята другим пользователем
+        if TaskEmployee.objects.filter(task=task).exists():
+            return JsonResponse(
+                {"success": False, "message": "Задача уже взята другим пользователем."}
+            )
 
-    # Создаем запись о том, что задача взята пользователем
-    TaskEmployee.objects.create(
-        task=task, employee=user, status=Status.objects.get(title="В процессе")
-    )
+        with transaction.atomic():
+            # Создаем запись о том, что задача взята пользователем
+            TaskEmployee.objects.create(
+                task=task, employee=user, status=Status.objects.get(title="В процессе")
+            )
 
-    # Обновляем статус задачи
-    task.status = Status.objects.get(title="В процессе")
-    task.save()
+            # Обновляем статус задачи
+            task.status = Status.objects.get(title="В процессе")
+            task.save()
 
-    return JsonResponse({"success": True, "message": "Задача успешно взята."})
+            return JsonResponse({"success": True, "message": "Задача успешно взята."})
+    return JsonResponse({"success": False, "error": "Invalid request method"})
 
 
 @login_required

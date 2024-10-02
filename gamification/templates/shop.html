@@ -22,29 +22,106 @@
     <div class="container px-4 px-lg-5 mt-5">
         <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
             <!--  -->
+            {% for product in products %}
             <div class="col mb-5">
-                <div class="card h-100">
+                <div class="card h-100" data-bs-toggle="modal" data-bs-target="#modalId"
+                    data-title="{{ product.title }}" data-description="{{ product.description }}"
+                    data-photo="{{ product.photo.url }}">
                     <!-- Product image-->
-                    <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="..." />
+                    <img class="card-img-top" src="{{ product.photo.url }}" alt="..."
+                        style="max-width: 450px; max-height: 300px;" />
                     <!-- Product details-->
                     <div class="card-body p-4">
                         <div class="text-center">
                             <!-- Product name-->
-                            <h5 class="fw-bolder">Fancy Product</h5>
+                            <h5 class="fw-bolder">{{ product.title }}</h5>
                             <!-- Product price-->
-                            $40.00 - $80.00
+                            {{ product.price }} Монет
                         </div>
                     </div>
                     <!-- Product actions-->
                     <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                        <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">View options</a></div>
+                        <div class="text-center">
+                            <!-- подумать как это обыграть -->
+                            {% if product.is_available %}
+                            <a class="btn btn-outline-dark mt-auto" href="#">Приобрести</a>
+                            {% else %}
+                            <!-- нет в наличии/не продается -->
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
+            {% endfor %}
             <!--  -->
         </div>
     </div>
 </section>
+
+<!-- Modal-window Achievements -->
+<div class="modal fade" id="modalId" tabindex="-1" role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitleId"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p></p>
+                <div class="d-flex justify-content-center">
+                    <img src="" alt="avatar" class="img-fluid" style="width: 150px; height: 165px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var modal = document.getElementById('modalId');
+        modal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var title = button.getAttribute('data-title');
+            var description = button.getAttribute('data-description');
+            var photo = button.getAttribute('data-photo');
+
+            var modalTitle = modal.querySelector('.modal-title');
+            var modalBody = modal.querySelector('.modal-body');
+            var modalImage = modal.querySelector('.modal-body img');
+
+            modalTitle.textContent = title;
+            modalBody.querySelector('p').textContent = description;
+            modalImage.src = photo;
+        });
+    });
+
+    // кнопка купить
+    // Check if button pressed
+    $(document).on('click', '#add-cart', function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'buy_product' %}",
+            data: {
+                product_id: $('#add-cart').val(),
+                product_qty: $('#inputQuantity').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                action: 'post'
+            },
+
+            success: function (json) {
+                // console.log(json)
+                document.getElementById("cart_quantity").textContent = json.qty
+            },
+
+            error: function (xhr, errmsg, err) {
+
+            }
+        });
+    })
+</script>
+
 {% endblock %}
 
 {% block js-scripts %}

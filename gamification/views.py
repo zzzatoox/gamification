@@ -251,8 +251,9 @@ def team_detail_test(request, team_id):
 
 
 @login_required(login_url="authorization")
-def invite_in_team(request):  #  (request, team_id)
+def invite_in_team(request, team_id):  #  (request, team_id)
     # все пользователи
+    team = get_object_or_404(Team, team_id=team_id)
     all_users = User.objects.exclude(is_superuser=True)
     all_users_photos = [get_user_photo_url(user) for user in all_users]
     all_users_with_photos = list(zip(all_users, all_users_photos))
@@ -261,6 +262,7 @@ def invite_in_team(request):  #  (request, team_id)
         request,
         "invite.html",
         {
+            "team": team,
             "all_users_with_photos": all_users_with_photos,
         },
     )
@@ -326,6 +328,8 @@ def create_task(request):
             title = request.POST.get("title")
             description = request.POST.get("description")
             team_id = request.POST.get("team_id")
+            coins = request.POST.get("coins")
+            xp = request.POST.get("xp")
 
             team = Team.objects.get(team_id=team_id)
 
@@ -333,8 +337,8 @@ def create_task(request):
                 title=title,
                 description=description,
                 team=team,
-                xp_reward=10,  # TODO: подставить реальное значение
-                coins_reward=5,  # TODO: подставить реальное значение
+                xp_reward=xp,  # TODO: подставить реальное значение
+                coins_reward=coins,  # TODO: подставить реальное значение
                 status=CREATED_STATUS,
             )
 
@@ -377,23 +381,23 @@ def assign_task(request):
     if request.method == "POST":
         with transaction.atomic():
             task_id = request.POST.get("task_id")
-            executor_id = request.POST.get("executor")
+            executor_id = request.POST.get("executor_id")
 
-            print("Assigning task: ", task_id, " to executor: ", executor_id)
+            task_employee = TaskEmployee.objects.create(
+                task_id=task_id, employee_id=executor_id
+            )
+            task = task_employee.task
 
-    #         task_employee = get_object_or_404(
-    #             TaskEmployee, task_id=task_id, employee_id=executor_id
-    #         )
-    #         task = task_employee.task
+            task_employee.status = IN_PROGRESS_STATUS
+            task_employee.save()
 
-    #         task_employee.status = IN_PROGRESS_STATUS
-    #         task_employee.save()
+            task.status = IN_PROGRESS_STATUS
+            task.save()
 
-    #         task.status = IN_PROGRESS_STATUS
-    #         task.save()
-
-    #         return JsonResponse({"success": True})
-    # return JsonResponse({"success": False, "error": "Invalid request method"})
+            messages.success(request, "Задача успешно назначена.")
+            return redirect("team_detail", team_id=task.team.team_id)
+    messages.error(request, "Произошла ошибка при назначении задачи.")
+    return redirect("team_detail", team_id=task.team.team_id)
 
 
 @login_required
@@ -401,12 +405,9 @@ def complete_task(request):
     if request.method == "POST":
         with transaction.atomic():
             task_id = request.POST.get("task_id")
-            employee_id = request.POST.get("employee_id")
 
             # получаю объект задачи и связи
-            task_employee = get_object_or_404(
-                TaskEmployee, task_id=task_id, employee_id=employee_id
-            )
+            task_employee = get_object_or_404(TaskEmployee, task_id=task_id)
             task = task_employee.task
 
             # изменяю статус задачи и связи
@@ -423,8 +424,10 @@ def complete_task(request):
             # изменяю количество опыта и монет
             employee_profile.complete_task(task.xp_reward, task.coins_reward)
 
-            return JsonResponse({"success": True})
-    return JsonResponse({"success": False, "error": "Invalid request method"})
+            messages.success(request, "Задача успешно отправлена на проверку.")
+            return redirect("team_detail", team_id=task.team.team_id)
+    messages.error(request, "Произошла ошибка при отправке задачи на проверку.")
+    return redirect("team_detail", team_id=task.team.team_id)
 
 
 # ИИ

@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block head %}
-<title>Профиль {username}</title>
+<title>Профиль команды {{ team.title }}</title>
 <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
@@ -57,7 +57,7 @@
                     d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
                 </svg>
               </button>
-              <a href="{% url 'invite' %}">
+              <a href="{% url 'invite' team.team_id %}">
                 <button class="btn btn-outline-dark">
                   Пригласить
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
@@ -93,7 +93,7 @@
             <div class="col">
               <div class="card mb-4 mb-md-0">
                 <div class="row text-center">
-                  <h3 class="mt-2">Участники</h3>
+                  <h3 class="mt-2">Сотрудники</h3>
                 </div>
                 <div class="card-body"
                   style="overflow-y: auto; {% if user == team.owner %} height:354px; {% else %} height:299px; {% endif %}">
@@ -113,7 +113,7 @@
                         {% if member.employee == team.owner %}
                         Глава
                         {% else %}
-                        Участник
+                        Сотрудник
                         {% endif %}
                       </div>
                       {% if user == team.owner and member.employee != team.owner %}
@@ -242,44 +242,44 @@
   </section>
 
   <!-- Modal-window CreateTasks -->
-<div class="modal fade" id="CreateTaskModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Создание задачи</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="createTaskForm" method="post" action="{% url 'create_task' %}">
-          {% csrf_token %}
-          <div class="mb-3">
-            <label class="col-form-label">Название:</label>
-            <input type="text" maxlength="30" class="form-control" id="recipient-name" name="title">
-          </div>
-          <div class="mb-3">
-            <label for="message-text" class="col-form-label">Описание</label>
-            <textarea class="form-control" id="message-text" name="description"></textarea>
-          </div>
-          <div class="mb-3 d-flex justify-content-start" id="xp_coins_result">
-            <label class="col-form-label mx-3">XP:</label>
-            <input type="text" maxlength="30" readonly class="form-control" id="xp_tb">
-            <label class="col-form-label mx-3">Монеты:</label>
-            <input type="text" maxlength="30" readonly class="form-control" id="coins_tb">
-          </div>
-          <div class="d-flex justify-content-end my-3">
-            <button type='button' id="get_xp_coins_btn" class="btn btn-primary">Рассчитать стоимость задачи</button>
-          </div>
-          <input type="hidden" id="executor_id" name="executor">
-          <input type="hidden" name="team_id" value="{{ team.team_id }}">
-          <div class="container d-flex justify-content-end">
-            <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
-            <button type="submit" class="btn btn-success m-1" id="create-task-id" disabled>Создать</button>
-          </div>
-        </form>
+  <div class="modal fade" id="CreateTaskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Создание задачи</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="createTaskForm" method="post" action="{% url 'create_task' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="col-form-label">Название:</label>
+              <input type="text" maxlength="30" class="form-control" id="recipient-name" name="title">
+            </div>
+            <div class="mb-3">
+              <label for="message-text" class="col-form-label">Описание</label>
+              <textarea class="form-control" id="message-text" name="description"></textarea>
+            </div>
+            <div class="mb-3 d-flex justify-content-start" id="xp_coins_result">
+              <label class="col-form-label mx-3">XP:</label>
+              <input type="text" maxlength="30" readonly class="form-control" id="xp_tb" name="xp">
+              <label class="col-form-label mx-3">Монеты:</label>
+              <input type="text" maxlength="30" readonly class="form-control" id="coins_tb" name="coins">
+            </div>
+            <div class="d-flex justify-content-end my-3">
+              <button type='button' id="get_xp_coins_btn" class="btn btn-primary">Рассчитать стоимость задачи</button>
+            </div>
+            <input type="hidden" id="executor_id" name="executor">
+            <input type="hidden" name="team_id" value="{{ team.team_id }}">
+            <div class="container d-flex justify-content-end">
+              <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
+              <button type="submit" class="btn btn-success m-1" id="create-task-id" disabled>Создать</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
   <!-- Modal-window EditTeamProfile -->
   <div class="modal fade" id="EditTeamProfile" tabindex="-1" aria-hidden="true">
@@ -361,7 +361,7 @@
         </div>
         <div class="modal-body">
           <!-- ФОРМА "ОТПРАВИТЬ ЗАДАЧУ НА ПРОВЕРКУ" -->
-          <form method="POST" action="">
+          <form method="POST" action="{% url 'complete_task' %}">
             {% csrf_token %}
             <div class="mb-3">
               <input type="hidden" id="task_id_inprogress" value="" name="task_id">
@@ -373,18 +373,18 @@
               <textarea class="form-control" readonly id="task-detail-in-progress-description-tb" rows="3"></textarea>
             </div>
             <div class="mb-3 d-flex justify-content-start"></div>
-              <label class="col-form-label mx-3">XP:</label>
-              <input type="text" maxlength="30" readonly class="form-control" id="xp_tb" name="title">
-              <label class="col-form-label mx-3">Монеты:</label>
-              <input type="text" maxlength="30" readonly class="form-control" id="coins_tb" name="title">
-            </div>
-            <div class="container d-flex justify-content-end">
-              <button type="submit" class="btn btn-success m-1">Отправить на проверку</button>
-            </div>
-          </form>
+            <label class="col-form-label mx-3">XP:</label>
+            <input type="text" maxlength="30" readonly class="form-control" id="xp_tb" name="title">
+            <label class="col-form-label mx-3">Монеты:</label>
+            <input type="text" maxlength="30" readonly class="form-control" id="coins_tb" name="title">
         </div>
+        <div class="container d-flex justify-content-end">
+          <button type="submit" class="btn btn-success m-1">Отправить на проверку</button>
+        </div>
+        </form>
       </div>
     </div>
+  </div>
   </div>
   <!-- Modal-window TaskDetailDone -->
   <div class="modal fade" id="TaskDetailDone" tabindex="-1" aria-hidden="true">
@@ -400,26 +400,26 @@
             {% csrf_token %}
             <div class="mb-3">
               <label class="form-label">Название</label>
-            <input type="hidden" id="task_id_done" value="">
-            <input type="text" class="form-control" readonly id="task-detail-done-name-tb">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Описание</label>
-            <textarea class="form-control" readonly id="task-detail-done-description-tb" rows="3"></textarea>
-            <!-- Если сообщение на проверке, и если его смотрит овнер, то отобразить кнопку "принять" -->
-            <div class="container d-flex justify-content-end">
-              {% if user == team.owner %}
-              <button type="submit" class="btn btn-sm btn-success">Принять</button>
-              {% endif %}
+              <input type="hidden" id="task_id_done" value="">
+              <input type="text" class="form-control" readonly id="task-detail-done-name-tb">
             </div>
-          </div>
-          <div class="mb-3 d-flex justify-content-start">
+            <div class="mb-3">
+              <label class="form-label">Описание</label>
+              <textarea class="form-control" readonly id="task-detail-done-description-tb" rows="3"></textarea>
+              <!-- Если сообщение на проверке, и если его смотрит овнер, то отобразить кнопку "принять" -->
+              <div class="container d-flex justify-content-end">
+                {% if user == team.owner %}
+                <button type="submit" class="btn btn-sm btn-success">Принять</button>
+                {% endif %}
+              </div>
+            </div>
+            <div class="mb-3 d-flex justify-content-start">
               <label class="col-form-label mx-3">XP:</label>
               <input type="text" maxlength="30" readonly class="form-control" id="xp_tb" name="title">
               <label class="col-form-label mx-3">Монеты:</label>
               <input type="text" maxlength="30" readonly class="form-control" id="coins_tb" name="title">
             </div>
-        </form>
+          </form>
         </div>
       </div>
     </div>
@@ -439,40 +439,40 @@
             {% csrf_token %}
             <input type="hidden" id="appoint-to-task-id" name="task_id" value="">
             <input type="text" class="form-control mb-4" id="add-executor-tb" placeholder="Кого вы хотите назначить?">
-            <input type="hidden" id="add-executor-id" name="executor_id" value=""> <!-- Скрытое поле для хранения id исполнителя -->
+            <input type="hidden" id="add-executor-id" name="executor_id" value="">
+            <!-- Скрытое поле для хранения id исполнителя -->
             <div class="card-body" style="overflow-y: auto; overflow-x: hidden; max-height: 700px;">
-                <!-- Карточка пользователя -->
-                {% for member, photo_url in members %}
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="member{{ member.employee.id }}" id="add-executor"
-                        >
-                    <div class="card executor-card mb-1" data-member-id="{{ member.employee.id }}"
-                        data-name="{{ member.employee.last_name }} {{ member.employee.first_name }} {{ member.employee.patronymic }}">
-                        <div class="card-body">
-                            <a class="card-link" style="text-decoration: none; color: inherit; cursor:pointer"
-                            data-value="{{ member.employee.id }}">
-                                <div class="row align-items-center">
-                                    <div class="col-2 m-1">
-                                        <img src="{{ photo_url }}" class="card-img-top rounded-circle mx-auto d-block m-1"
-                                        style="width: 50px; height: 50px;">
-                                    </div>
-                                    <div class="col-8" style="font-size: 14.5pt;">
-                                        <p><span style="font-style: italic;">ФИО: </span>{{ member.employee.last_name }} {{
-                                            member.employee.first_name }} {{ member.employee.patronymic }}</p>
-                                        <p><span style="font-style: italic;">Логин: </span>{{ member.employee.username }}</p>
-                                    </div>
-                                </div>
-                            </a>
+              <!-- Карточка пользователя -->
+              {% for member, photo_url in members %}
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="member{{ member.employee.id }}" id="add-executor">
+                <div class="card executor-card mb-1" data-member-id="{{ member.employee.id }}"
+                  data-name="{{ member.employee.last_name }} {{ member.employee.first_name }} {{ member.employee.patronymic }}">
+                  <div class="card-body">
+                    <a class="card-link" style="text-decoration: none; color: inherit; cursor:pointer"
+                      data-value="{{ member.employee.id }}">
+                      <div class="row align-items-center">
+                        <div class="col-2 m-1">
+                          <img src="{{ photo_url }}" class="card-img-top rounded-circle mx-auto d-block m-1"
+                            style="width: 50px; height: 50px;">
                         </div>
-                    </div>
+                        <div class="col-8" style="font-size: 14.5pt;">
+                          <p><span style="font-style: italic;">ФИО: </span>{{ member.employee.last_name }}
+                            {{member.employee.first_name }} {{ member.employee.patronymic }}</p>
+                          <p><span style="font-style: italic;">Логин: </span>{{ member.employee.username }}</p>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
                 </div>
-                {% endfor %}
+              </div>
+              {% endfor %}
             </div>
             <div class="d-flex justify-content-end">
-                <button class="btn btn-danger m-2" type="button" id="cancel-btn" href="#">Отменить</button>
-                <button class="btn btn-success m-2" type="submit">Назначить</button>
-            </form>
-          </div>
+              <button class="btn btn-danger m-2" type="button" id="cancel-btn" href="#">Отменить</button>
+              <button class="btn btn-success m-2" type="submit">Назначить</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -627,13 +627,13 @@
       });
     });
     document.querySelectorAll('.executor-card').forEach(card => {
-    card.addEventListener('click', function() {
+      card.addEventListener('click', function () {
         const memberId = this.getAttribute('data-member-id');
         const memberName = this.getAttribute('data-name');
         document.getElementById('add-executor-id').value = memberId;
         document.getElementById('add-executor-tb').value = memberName;
+      });
     });
-});
     document.getElementById('cancel-btn').addEventListener('click', function () {
       location.reload();
     });
@@ -653,13 +653,13 @@
       const taskText = headers + ' ' + description;
 
       $.ajax({
-        url: "{% url 'calculate_reward' %}", 
+        url: "{% url 'calculate_reward' %}",
         type: "POST",
         data: {
           task_text: taskText,
           csrfmiddlewaretoken: '{{ csrf_token }}'
         },
-        success: function(response) {
+        success: function (response) {
           if (response.error) {
             $('#xp_coins_result').html(`<p>Ошибка: ${response.error}</p>`);
           } else {
@@ -669,7 +669,7 @@
             $('#create-task-id').prop('disabled', false);
           }
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
           $('#xp_coins_result').html(`<p>Ошибка: ${error}</p>`);
         }
       });

@@ -325,14 +325,14 @@
               <textarea class="form-control" readonly id="task-detail-todo-description-tb" rows="3"></textarea>
             </div>
             <div class="container d-flex justify-content-end">
+              {% if user == team.owner %}
+              <button class="btn btn-primary m-1" type="button" data-bs-target="#AddExecutor" id="appoint_to_btn"
+                data-bs-toggle="modal">Назначить
+                исполнителя</button>
+              {% endif %}
               <button type="submit" class="btn btn-success m-1" id="take-task-btn" data-task-id="">Взять задачу</button>
             </div>
           </form>
-          {% if user == team.owner %}
-          <button class="btn btn-primary m-1" data-bs-target="#AddExecutor" id="appoint_to_btn"
-            data-bs-toggle="modal">Назначить
-            исполнителя</button>
-          {% endif %}
         </div>
       </div>
     </div>
@@ -443,7 +443,7 @@
             {% endfor %}
           </div>
           <div class="d-flex justify-content-end">
-            <button class="btn btn-danger m-2" id="cancel-btn" href="#">Отменить</button>
+            <button class="btn btn-danger m-2" type="button" id="cancel-btn" href="#">Отменить</button>
             <button class="btn btn-success m-2" type="submit">Назначить</button>
           </form>
         </div>

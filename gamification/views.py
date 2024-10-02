@@ -487,6 +487,7 @@ def get_answer(task_text, giga_token):
         return None
 
 
+@login_required
 def calculate_reward(request):
     if request.method == "POST":
         task_text = request.POST.get("task_text", "")
@@ -498,6 +499,15 @@ def calculate_reward(request):
                 answers_arr = answer.split(" ")
                 experience = answers_arr[0]
                 coins = answers_arr[1]
+
+                try:
+                    experience = int(experience)
+                    coins = int(coins)
+                except ValueError:
+                    return JsonResponse(
+                        {"error": "experience и coins должны быть числами"}, status=400
+                    )
+
                 return JsonResponse({"experience": experience, "coins": coins})
             except:
                 return JsonResponse(

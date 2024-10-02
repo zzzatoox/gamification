@@ -4,6 +4,7 @@
 {% block head %}
 <title>Профиль {username}</title>
 <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <style>
   .scrum-board {
     display: flex;
@@ -241,45 +242,44 @@
   </section>
 
   <!-- Modal-window CreateTasks -->
-  <div class="modal fade" id="CreateTaskModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Создание задачи</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="createTaskForm" method="post" action="{% url 'create_task' %}">
-            {% csrf_token %}
-            <div class="mb-3">
-              <label class="col-form-label">Название:</label>
-              <input type="text" maxlength="30" class="form-control" id="recipient-name" name="title">
-            </div>
-            <div class="mb-3">
-              <label for="message-text" class="col-form-label">Описание</label>
-              <textarea class="form-control" id="message-text" name="description"></textarea>
-            </div>
-            <div class="mb-3 d-flex justify-content-start">
-              <label class="col-form-label mx-3">XP:</label>
-              <input type="text" maxlength="30" readonly class="form-control" id="xp_tb">
-              <label class="col-form-label mx-3">Монеты:</label>
-              <input type="text" maxlength="30" readonly class="form-control" id="coins_tb">
-            </div>
-            <div class="d-flex justify-content-end my-3">
-              <button type='button' id="get_xp_coins_btn" class="btn btn-primary">Рассчитать стоимость задачи</button>
-            </div>
-            <input type="hidden" id="executor_id" name="executor">
-            <input type="hidden" name="team_id" value="{{ team.team_id }}">
-            <div class="container d-flex justify-content-end">
-              <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
-              <button type="submit" class="btn btn-success m-1" id="create-task-id">Создать</button>
-            </div>
-          </form>
-        </div>
+<div class="modal fade" id="CreateTaskModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Создание задачи</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="createTaskForm" method="post" action="{% url 'create_task' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="col-form-label">Название:</label>
+            <input type="text" maxlength="30" class="form-control" id="recipient-name" name="title">
+          </div>
+          <div class="mb-3">
+            <label for="message-text" class="col-form-label">Описание</label>
+            <textarea class="form-control" id="message-text" name="description"></textarea>
+          </div>
+          <div class="mb-3 d-flex justify-content-start" id="xp_coins_result">
+            <label class="col-form-label mx-3">XP:</label>
+            <input type="text" maxlength="30" readonly class="form-control" id="xp_tb">
+            <label class="col-form-label mx-3">Монеты:</label>
+            <input type="text" maxlength="30" readonly class="form-control" id="coins_tb">
+          </div>
+          <div class="d-flex justify-content-end my-3">
+            <button type='button' id="get_xp_coins_btn" class="btn btn-primary">Рассчитать стоимость задачи</button>
+          </div>
+          <input type="hidden" id="executor_id" name="executor">
+          <input type="hidden" name="team_id" value="{{ team.team_id }}">
+          <div class="container d-flex justify-content-end">
+            <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
+            <button type="submit" class="btn btn-success m-1" id="create-task-id" disabled>Создать</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-
+</div>
 
   <!-- Modal-window EditTeamProfile -->
   <div class="modal fade" id="EditTeamProfile" tabindex="-1" aria-hidden="true">
@@ -646,10 +646,34 @@
         // Логика для удаления задачи
       });
     });
-    document.getElementById('get_xp_coins_btn').addEventListener('click', function () {
-      ///логика для АЯСА 
-    });
 
+    document.getElementById('get_xp_coins_btn').addEventListener('click', function () {
+      const headers = $('#recipient-name').val();
+      const description = $('#message-text').val();
+      const taskText = headers + ' ' + description;
+
+      $.ajax({
+        url: "{% url 'calculate_reward' %}", 
+        type: "POST",
+        data: {
+          task_text: taskText,
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function(response) {
+          if (response.error) {
+            $('#xp_coins_result').html(`<p>Ошибка: ${response.error}</p>`);
+          } else {
+            console.log(response);
+            $('#xp_tb').val(response.experience);
+            $('#coins_tb').val(response.coins);
+            $('#create-task-id').prop('disabled', false);
+          }
+        },
+        error: function(xhr, status, error) {
+          $('#xp_coins_result').html(`<p>Ошибка: ${error}</p>`);
+        }
+      });
+    });
   </script>
 
 

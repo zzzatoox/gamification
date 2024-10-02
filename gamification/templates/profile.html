@@ -17,12 +17,33 @@
             <div class="card-body text-center">
               <img src="{{ user_photo_url }}" alt="User Photo" class="img-fluid" style="width: 150px; height: 165px;">
               <h5 class="my-3">{{user_info.username}}</h5>
+              <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#EditTeamProfile">Загрузить
+                фотографию
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pencil"
+                  viewBox="0 0 16 16">
+                  <path
+                    d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
+                </svg>
+              </button>
+              <a href="{% url 'inventory' %}">
+                <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#EditTeamProfile">Инвентарь
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                    class="bi bi-pencil" viewBox="0 0 16 16">
+                    <path
+                      d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325" />
+                  </svg>
+                </button>
+              </a>
               <div class="mb-2">
                 <p class="mt-4 mb-1" style="font-size: .77rem;">
-                  {{user_game_info.rank.title}}/{{user_game_info.level}}/{{user_game_info.xp}}</p>
+                  ранг: {{user_game_info.rank.title}} уровень: {{user_game_info.level}} опыт: {{user_game_info.xp}}</p>
                 <div class="progress rounded mb-2" style="height: 5px;">
-                  <div class="progress-bar" role="progressbar" style="width: 66%" aria-valuenow="66" aria-valuemin="0"
-                    aria-valuemax="100"></div>
+                  <div class="progress-bar" role="progressbar" style="width: {{user_game_info.get_progress}}%"
+                    aria-valuenow="{{ user_game_info.get_progress }}" aria-valuemin="0" aria-valuemax="100">
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span>Требуемый опыт для следующего уровня: {{ user_game_info.get_next_level_required_xp }}</span>
                 </div>
               </div>
             </div>
@@ -115,6 +136,32 @@
           <div class="d-flex justify-content-center">
             <img src="" alt="avatar" class="img-fluid" style="width: 150px; height: 165px;">
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal-window EditProfile -->
+  <div class="modal fade" id="EditTeamProfile" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Редактирование профиля</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editTeamForm" method="post" action="{% url 'edit_profile' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="message-text" class="col-form-label">Фото:</label>
+              <input class="form-control" type="file" id="photo-team-profile-tb" name="photo" accept="image/*">
+            </div>
+            <input type="hidden" name="team_id" value="{{ team.team_id }}">
+            <div class="container d-flex justify-content-end">
+              <button type="button" class="btn btn-secondary m-1" data-bs-dismiss="modal">Отмена</button>
+              <button type="submit" class="btn btn-primary m-1">Сохранить</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

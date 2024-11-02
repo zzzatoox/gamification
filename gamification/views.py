@@ -304,10 +304,11 @@ def kick(request, team_id, employee_id):
 @login_required(login_url="authorization")
 def shop(request):
     products = Product.objects.all()
+    user_profile = UserProfile.objects.get(user=request.user)
     return render(
         request,
         "shop.html",
-        {"products": products},
+        {"products": products, "user_profile": user_profile},
     )
 
 
@@ -482,6 +483,11 @@ def complete_task(request):
 
             # получаю объект задачи и связи
             task_employee = get_object_or_404(TaskEmployee, task_id=task_id)
+
+            if task_employee.employee != request.user:
+                messages.error(request, "Нельзя отправить на проверку чужую задачу.")
+                return redirect("team_detail", team_id=task_employee.task.team_id)
+                
             task = task_employee.task
 
             completed_status = Status.objects.get_or_create(title="Выполнена")[0]
@@ -529,7 +535,7 @@ def get_token():
         "Content-Type": "application/x-www-form-urlencoded",
         "Accept": "application/json",
         # "RqUID": "5dd2073a-f60f-4221-9063-c4c3daae50d0",
-        "RqUID": "6a7a585f-6dac-489c-82fc-fdc37e6e1195",
+        "RqUID": "3d2acadb-e8ec-4e20-a4fe-91eeced87dfe",
         "Authorization": "Basic NTRiOThmOTctMGQxZS00YTZhLTljZDQtZDcwZThiMWE5MTc4OmE1NmQ3ZGIxLTA4YWEtNGM1Yi1iMjdhLTBjOWVjMDVkYjk0Mg==",
     }
 

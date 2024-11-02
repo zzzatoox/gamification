@@ -95,7 +95,7 @@ def check_level_for_achievement(sender, instance, **kwargs):
 @receiver(post_save, sender=TaskEmployee)
 def check_task_completion(sender, instance, **kwargs):
     # Выполнение задания
-    if instance.status.title == "Выполнено" and instance.completed_at:
+    if instance.status.title == "Выполнена" and instance.completed_at:
         # Проверяем, есть ли достижения для выполнения одной задачи
         achievement = Achievement.objects.filter(title="Начало").first()
         if (

@@ -276,9 +276,9 @@
             </div>
             <div class="mb-3 d-flex justify-content-start" id="xp_coins_result">
               <label class="col-form-label mx-3">XP:</label>
-              <input type="text" maxlength="30" readonly class="form-control" id="xp_tb">
+              <input type="text" maxlength="30" readonly class="form-control" id="xp_tb" name="xp">
               <label class="col-form-label mx-3">Монеты:</label>
-              <input type="text" maxlength="30" readonly class="form-control" id="coins_tb">
+              <input type="text" maxlength="30" readonly class="form-control" id="coins_tb" name="coins">
             </div>
             <div class="d-flex justify-content-end my-3">
               <button type='button' id="get_xp_coins_btn" class="btn btn-primary">Рассчитать стоимость задачи</button>
@@ -617,7 +617,7 @@
           document.getElementById('task-detail-in-progress-name-tb').value = title;
           document.getElementById('task-detail-in-progress-description-tb').value = description;
           document.getElementById('coins_tb_inprogress').value = coins;
-          document.getElementById('xp_tb_inprogress').value = xp;
+          document.getElementById('xp_tb_ipprogress').value = xp;
           break;
         case 'scrum-column scrum-column-done':
           document.getElementById('task_id_done').value = task_id;
